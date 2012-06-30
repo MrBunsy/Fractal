@@ -59,29 +59,41 @@ public class FractalWindow extends javax.swing.JFrame {
 
      private void key(java.awt.event.KeyEvent evt) {                         
         int key = evt.getKeyCode();
-        int x=0;
-        int y=0;
+//        int x=0;
+//        int y=0;
         //TODO WASD too?
         switch(key){
             case java.awt.event.KeyEvent.VK_KP_DOWN:
             case java.awt.event.KeyEvent.VK_DOWN:
                 //down
-                y+=1;
+                //y+=1;
+                fractal.move(0, 1);
                 break;
             case java.awt.event.KeyEvent.VK_LEFT:
             case java.awt.event.KeyEvent.VK_KP_LEFT:
-                x-=1;
+                //x-=1;
+                fractal.move(-1, 0);
                 break;
             case java.awt.event.KeyEvent.VK_RIGHT:
             case java.awt.event.KeyEvent.VK_KP_RIGHT:
-                x+=1;
+                //x+=1;
+                fractal.move(1, 0);
                 break;
             case java.awt.event.KeyEvent.VK_UP:
             case java.awt.event.KeyEvent.VK_KP_UP:
-                y-=1;
+                //y-=1;
+                fractal.move(0, -1);
+                break;
+            case java.awt.event.KeyEvent.VK_ADD:
+                fractal.changeDetail(true);
+                break;
+            case java.awt.event.KeyEvent.VK_SUBTRACT:
+                fractal.changeDetail(false);
                 break;
         }
-        fractal.move(x, y);
+//        if(x!=0 && y!=0){
+//            fractal.move(x, y);
+//        }
         repaint();
     }             
     

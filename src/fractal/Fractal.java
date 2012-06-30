@@ -21,6 +21,7 @@ public class Fractal {
     //private Colour black = new Colour(0,0,0);
     private Vector centre;
     private double zoom;
+    private double zoomAdjust=0.8;
 
     /**
      * @param args the command line arguments
@@ -56,7 +57,8 @@ public class Fractal {
 
     public Colour iterationToColour(int i) {
 
-        Colour c = Colour.hsvToRgb((double) (i % 50) / 50.0, 0.5, 1.0);
+        //Colour c = Colour.hsvToRgb((double) (i % 50) / 50.0, 0.5, 1.0);
+        Colour c = Colour.hsvToRgb((double) i/detail, 0.5, 1.0);
         return c;
     }
 
@@ -66,6 +68,16 @@ public class Fractal {
         generate();
     }
 
+    public void changeDetail(boolean more){
+        if(more){
+            detail*=5;
+        }else{
+            detail/=5;
+        }
+        
+        generate();
+    }
+    
     public void scroll(double scroll) {
         Point m = window.getMousePosition();
 
@@ -75,27 +87,28 @@ public class Fractal {
             //mouse position on the complex plain
             Vector mouseComplex = offset().add(mouseScreen.multiply(zoom / (double) width));
 
-            //difference between centre and mousecomplex
-            //difference in ratios of zoom
-            //subtract centre the difference * the change in zoom
+            //mouseComplex = offset + mouseScreen*zoomAdjust
+            //re-arrange for offset, then deal with change in zoom
+            //offset = mouseComplex - mouseScreen*newZoomAdjust
+            //could do this to revolve around centre, not offset, but this was easier to think about
 
-            if (scroll < 0) {
-                zoom *= 0.9;
-            } else {
-                zoom /= 0.9;
-            }
-
+            updateZoom(scroll);
+            
             Vector newOffset = mouseComplex.subtract(mouseScreen.multiply(zoom / (double) width));
             centre = newOffset.add(new Vector(zoom / 2.0, zoom / 2.0));
         } else {
-            if (scroll < 0) {
-                zoom *= 0.9;
-            } else {
-                zoom /= 0.9;
-            }
+            updateZoom(scroll);
         }
         generate();
 
+    }
+    
+    private void updateZoom(double scroll){
+        if (scroll < 0) {
+                zoom *= zoomAdjust;
+            } else {
+                zoom /= zoomAdjust;
+            }
     }
 
     private Vector offset() {
@@ -149,6 +162,6 @@ public class Fractal {
 
         g.drawImage(buffer, 0, 0, null);
 
-        g.drawString("Centre: " + centre + " Zoom: " + zoom, 10, 50);
+        g.drawString("Centre: " + centre + " Zoom: " + zoom + " Detail: "+detail, 10, 50);
     }
 }
