@@ -90,6 +90,9 @@ public class FractalWindow extends javax.swing.JFrame {
             case java.awt.event.KeyEvent.VK_SUBTRACT:
                 fractal.changeDetail(false);
                 break;
+            case java.awt.event.KeyEvent.VK_PRINTSCREEN:
+                fractal.save();
+                break;
         }
 //        if(x!=0 && y!=0){
 //            fractal.move(x, y);

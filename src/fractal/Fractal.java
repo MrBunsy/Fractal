@@ -8,6 +8,10 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import LukesBits.*;
 import java.awt.Point;
+import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -17,7 +21,10 @@ public class Fractal {
 
     private FractalWindow window;
     private int width, height, detail;
-    private BufferedImage buffer;
+    private BufferedImage outputImage;
+    private int[][] buffer;
+    private int minI,maxI;
+    private double averageI;
     //private Colour black = new Colour(0,0,0);
     private Vector centre;
     private double zoom;
@@ -36,6 +43,8 @@ public class Fractal {
         height = _height;
 
         detail = 50;
+        
+        
 
         //origin = new Vector((double)width*0.75,(double)height/2.0);
         //zoom = 2.0/(double)width;
@@ -46,8 +55,10 @@ public class Fractal {
         centre = new Vector(-0.5, 0);
 
 
-        buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-
+        outputImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        buffer = new int[width][height];
+        
+        
         generate();
 
         window = new FractalWindow(this, width, height);
@@ -57,8 +68,19 @@ public class Fractal {
 
     public Colour iterationToColour(int i) {
 
+        if(i==detail){
+            return new Colour(0,0,0);
+        }
+        
+        //all these work:
         //Colour c = Colour.hsvToRgb((double) (i % 50) / 50.0, 0.5, 1.0);
-        Colour c = Colour.hsvToRgb((double) i/detail, 0.5, 1.0);
+        //Colour c = Colour.hsvToRgb((double) i/detail, 0.5, 1.0);
+        //Colour c = Colour.hsvToRgb((double) (i-minI)/(maxI-minI), 0.5, 1.0);
+        
+        
+        //Colour c = Colour.hsvToRgb((double) (i-minI)/averageI, 0.5, 1.0);
+        //Colour c = Colour.hsvToRgb((double)i%255/255, 0.5, 1.0);
+        Colour c = Colour.hsvToRgb((double) (i-minI)%averageI/averageI, 0.5, 1.0);
         return c;
     }
 
@@ -118,6 +140,12 @@ public class Fractal {
     }
 
     public void generate() {
+        
+        minI=detail;
+        maxI=0;
+        
+        int totalIs=0;
+        
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 Colour colour;
@@ -144,24 +172,70 @@ public class Fractal {
                     i++;
                 }
 
-                if (i >= detail) {
-                    //black for not maxed out yet
-                    colour = new Colour(0, 0, 0);
-
-                } else {
-                    colour = iterationToColour(i);
+                if(i<minI){
+                    minI=i;
                 }
+                
+                if(i>maxI){
+                    maxI=i;
+                }
+                
+                totalIs+=i;
+//                if (i >= detail) {
+//                    //black for not maxed out yet
+//                    colour = new Colour(0, 0, 0);
+//
+//                } else {
+//                    colour = iterationToColour(i);
+//                }
 
-                buffer.setRGB(x, height - y - 1, colour.toColor().getRGB());
+                //outputImage.setRGB(x, height - y - 1, colour.toColor().getRGB());
+                buffer[x][height - y - 1] = i;
             }
         }
+        averageI=(double)totalIs/(double)(width*height);
+        bufferToImage();
+    }
+    
+    //take the iteration values in the buffer and create the image;
+    private void bufferToImage(){
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                outputImage.setRGB(x, y, iterationToColour(buffer[x][y]).toColor().getRGB());
+            }
+        }
+    }
+    
+    public void save(){
+        try {
+            
+            String filename = (int) (System.currentTimeMillis() / 1000L)+"";
+            
+            ImageIO.write(outputImage, "png", new File(filename+".png"));
+            
+//            PrintWriter out = new PrintWriter(filename+".txt");
+//            out.println(infoString());
+            
+            FileWriter fstream = new FileWriter(filename+".txt");
+            BufferedWriter out = new BufferedWriter(fstream);
+            out.write(infoString());
+            //Close the output stream
+            out.close();
+            
+        } catch (IOException ex) {
+            Logger.getLogger(Fractal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private String infoString(){
+        return "Centre: " + centre + ", Zoom: " + zoom + ", Detail: "+detail;
     }
 
     public void draw(Graphics g) {//,int width,int height
         //Graphics2D g = (Graphics2D) _g;
 
-        g.drawImage(buffer, 0, 0, null);
+        g.drawImage(outputImage, 0, 0, null);
 
-        g.drawString("Centre: " + centre + " Zoom: " + zoom + " Detail: "+detail, 10, 50);
+        g.drawString(infoString(), 10, 50);
     }
 }
