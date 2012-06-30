@@ -17,8 +17,8 @@ public class Fractal {
     private FractalWindow window;
     private int width,height, detail;
     private BufferedImage buffer;
-    private Colour black = new Colour(0,0,0);
-    private Vector origin;
+    //private Colour black = new Colour(0,0,0);
+    private Vector centre;
     private double zoom;
     
     /**
@@ -33,11 +33,15 @@ public class Fractal {
         width=_width;
         height = _height;
         
-        detail=500;
+        detail=50;
         
-        origin = new Vector((double)width*0.75,(double)height/2.0);
-        zoom = 2.0/(double)width;
+        //origin = new Vector((double)width*0.75,(double)height/2.0);
+        //zoom = 2.0/(double)width;
         
+        //the length of the real axis which stretches across the screen
+        zoom = 3.0;
+        //what value on the complex plain is in the centre of the screen
+        centre = new Vector(-0.5,0);
         
         
         buffer =  new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
@@ -55,15 +59,38 @@ public class Fractal {
         return c;
     }
     
+    //taking ints where they are either -1,0 or 1, so the current zoom level is taken into account
+    public void move(int x, int y){
+        centre=centre.add(new Vector(x,y),(zoom*0.1));
+        generate();
+    }
+    
+    public void scroll(double scroll){
+        //zoom+=scroll/500;
+        if(scroll < 0){
+            zoom*=0.9;
+        }else{
+            zoom/=0.9;
+        }
+        generate();
+        
+    }
+    
     public void generate(){
-        for(int x=0;x<this.width;x++){
-            for(int y=0;y<this.height;y++){
+        for(int x=0;x<width;x++){
+            for(int y=0;y<height;y++){
                 Colour colour;
                 
-                Vector p = new Vector(x,y);
+                Vector p = new Vector(x,height-y-1);
                 
-                p=p.subtract(this.origin);
-                p=p.multiply(this.zoom);
+                //get p to be relative to offset in the complex plain
+                p=p.multiply(zoom/(double)width);
+                
+                //offset is the top left on the viewport on the complex plain
+                Vector offset = centre.subtract(new Vector(1,1).multiply(zoom/2.0));
+                p=p.add(offset);
+                //p=p.subtract(new Vector(zoom/2.0,zoom/2.0));//origin.add(
+                
                 
                 Complex c = new Complex(p.x,p.y);
                 
@@ -84,7 +111,7 @@ public class Fractal {
                     colour = iterationToColour(i);
                 }
                 
-                buffer.setRGB(x, y, colour.toColor().getRGB());
+                buffer.setRGB(x, height-y-1, colour.toColor().getRGB());
             }
         }
     }
@@ -93,5 +120,7 @@ public class Fractal {
         //Graphics2D g = (Graphics2D) _g;
         
         g.drawImage(buffer, 0, 0, null);
+        
+        g.drawString("Centre: "+centre+" Zoom: "+zoom, 10, 50);
     }
 }
