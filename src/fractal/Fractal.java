@@ -19,7 +19,7 @@ import javax.imageio.ImageIO;
  */
 public class Fractal {
 
-    private FractalWindow window;
+    private IFractalWindow window;
     private int width, height, detail;
     private BufferedImage outputImage;
     private int[][] buffer;
@@ -29,17 +29,70 @@ public class Fractal {
     private Vector centre;
     private double zoom;
     private double zoomAdjust=0.8;
+    
+    private boolean allowSave;
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        Fractal f = new Fractal(600, 600);
+        Fractal f = new Fractal(600, 600,true);
+        FractalWindow w = new FractalWindow(f,600,600);
+        f.setWindow(w);
+    }
+    
+    public void key(int key){
+        
+//        int x=0;
+//        int y=0;
+        //TODO WASD too?
+        switch(key){
+            case java.awt.event.KeyEvent.VK_KP_DOWN:
+            case java.awt.event.KeyEvent.VK_DOWN:
+                //down
+                //y+=1;
+                move(0, 1);
+                break;
+            case java.awt.event.KeyEvent.VK_LEFT:
+            case java.awt.event.KeyEvent.VK_KP_LEFT:
+                //x-=1;
+                move(-1, 0);
+                break;
+            case java.awt.event.KeyEvent.VK_RIGHT:
+            case java.awt.event.KeyEvent.VK_KP_RIGHT:
+                //x+=1;
+                move(1, 0);
+                break;
+            case java.awt.event.KeyEvent.VK_UP:
+            case java.awt.event.KeyEvent.VK_KP_UP:
+                //y-=1;
+                move(0, -1);
+                break;
+            case java.awt.event.KeyEvent.VK_ADD:
+                changeDetail(true);
+                break;
+            case java.awt.event.KeyEvent.VK_SUBTRACT:
+                changeDetail(false);
+                break;
+            case java.awt.event.KeyEvent.VK_PRINTSCREEN:
+                save();
+                break;
+        }
+//        if(x!=0 && y!=0){
+//            fractal.move(x, y);
+//        }
+        window.repaint();
     }
 
-    public Fractal(int _width, int _height) {
+    public void setWindow(IFractalWindow _window){
+        window=_window;
+    }
+    
+    public Fractal(int _width, int _height, boolean _allowSave) {
         width = _width;
         height = _height;
+        
+        allowSave=_allowSave;
 
         detail = 50;
         
@@ -60,9 +113,9 @@ public class Fractal {
         
         generate();
 
-        window = new FractalWindow(this, width, height);
+        //window = new FractalWindow(this, width, height);
 
-        window.setVisible(true);
+        
     }
 
     public Colour iterationToColour(int i) {
@@ -76,6 +129,7 @@ public class Fractal {
         //Colour c = Colour.hsvToRgb((double) i/detail, 0.5, 1.0);
         //Colour c = Colour.hsvToRgb((double) (i-minI)/(maxI-minI), 0.5, 1.0);
         
+        //idea - look at iteration range and work it out so that it repeats x times across that range?
         
         //Colour c = Colour.hsvToRgb((double) (i-minI)/averageI, 0.5, 1.0);
         //Colour c = Colour.hsvToRgb((double)i%255/255, 0.5, 1.0);
@@ -97,6 +151,16 @@ public class Fractal {
         }
         
         generate();
+    }
+    
+    public void drag(Point down, Point up){
+        if(down!=null){
+            Vector difference = new Vector(up.x - down.x , up.y - down.y);
+            
+            centre=centre.subtract(difference,zoom/(double)width);
+            
+            generate();
+        }
     }
     
     public void scroll(int scroll) {
@@ -206,23 +270,25 @@ public class Fractal {
     }
     
     public void save(){
-        try {
-            
-            String filename = (int) (System.currentTimeMillis() / 1000L)+"";
-            
-            ImageIO.write(outputImage, "png", new File(filename+".png"));
-            
-//            PrintWriter out = new PrintWriter(filename+".txt");
-//            out.println(infoString());
-            
-            FileWriter fstream = new FileWriter(filename+".txt");
-            BufferedWriter out = new BufferedWriter(fstream);
-            out.write(infoString());
-            //Close the output stream
-            out.close();
-            
-        } catch (IOException ex) {
-            Logger.getLogger(Fractal.class.getName()).log(Level.SEVERE, null, ex);
+        if(allowSave){
+            try {
+
+                String filename = (int) (System.currentTimeMillis() / 1000L)+"";
+
+                ImageIO.write(outputImage, "png", new File(filename+".png"));
+
+    //            PrintWriter out = new PrintWriter(filename+".txt");
+    //            out.println(infoString());
+
+                FileWriter fstream = new FileWriter(filename+".txt");
+                BufferedWriter out = new BufferedWriter(fstream);
+                out.write(infoString());
+                //Close the output stream
+                out.close();
+
+            } catch (IOException ex) {
+                Logger.getLogger(Fractal.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
     

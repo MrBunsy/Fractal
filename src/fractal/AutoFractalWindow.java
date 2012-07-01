@@ -43,6 +43,19 @@ public class AutoFractalWindow extends javax.swing.JFrame {
                 mouseWheel(evt);
             }
         });
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                AutoFractalWindow.this.mouseReleased(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                AutoFractalWindow.this.mousePressed(evt);
+            }
+        });
+        addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                AutoFractalWindow.this.mouseDragged(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -61,6 +74,18 @@ public class AutoFractalWindow extends javax.swing.JFrame {
     private void mouseWheel(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_mouseWheel
         // TODO add your handling code here:
     }//GEN-LAST:event_mouseWheel
+
+    private void mouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mouseDragged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_mouseDragged
+
+    private void mousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mousePressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_mousePressed
+
+    private void mouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_mouseReleased
+        // TODO add your handling code here:
+    }//GEN-LAST:event_mouseReleased
 
      public void paint(Graphics g){
         //Graphics _g = getBufferStrategy().getDrawGraphics();

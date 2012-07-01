@@ -10,6 +10,15 @@
 <project name="Fractal" default="default" basedir=".">
     <description>Builds, tests, and runs the project Fractal.</description>
     <import file="nbproject/build-impl.xml"/>
+    <target name="-post-jar">
+		<jar jarfile="dist/Fractal-with-libs.jar">
+			<zipfileset src="${dist.jar}" excludes="META-INF/*" />
+			<zipfileset src="dist/lib/LukesBits.jar" excludes="META-INF/*" />
+			<manifest>
+				<attribute name="Main-Class" value="fractal.Fractal"/>
+			</manifest>
+		</jar>
+	</target>
     <!--
 
     There exist several targets which are by default empty and which can be 
