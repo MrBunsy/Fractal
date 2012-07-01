@@ -67,11 +67,13 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
 //            }
 //        });
 
+        setVisible(true);
+        
 //        while(getBufferStrategy() == null){
 //            createBufferStrategy(2);
 //        }
 
-        setVisible(true);
+        
     }
 
 //    private void mouseDragged(java.awt.event.MouseEvent evt) {
@@ -87,13 +89,13 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
 
         mouseDown = null;
 
-        repaint();
+        //repaint();
     }
 
     private void mouseWheel(java.awt.event.MouseWheelEvent evt) {
         int scroll = evt.getWheelRotation();//.getPreciseWheelRotation();
         fractal.scroll(scroll);
-        repaint();
+        //repaint();
     }
 
     private void key(java.awt.event.KeyEvent evt) {
@@ -107,8 +109,8 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
         //Dimension d = getSize();
 
         fractal.draw(g);//,d.width,d.height);
-//        getBufferStrategy().show();
-//        _g.dispose();
+        //getBufferStrategy().show();
+        //_g.dispose();
 
     }
     // Variables declaration - do not modify

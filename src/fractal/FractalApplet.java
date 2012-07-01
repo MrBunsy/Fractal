@@ -21,7 +21,7 @@ public class FractalApplet extends JApplet implements IFractalWindow, MouseWheel
      * the browser.
      */
     public void init() {
-        fractal = new Fractal(600, 600,false);
+        fractal = new Fractal(600, 600,false,1);
         fractal.setWindow(this);
         
         addMouseWheelListener(this);
@@ -44,7 +44,7 @@ public class FractalApplet extends JApplet implements IFractalWindow, MouseWheel
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         fractal.scroll(e.getWheelRotation());
-        repaint();
+        //repaint();
         e.consume();
     }
 
@@ -65,7 +65,7 @@ public class FractalApplet extends JApplet implements IFractalWindow, MouseWheel
 
         mouseDown = null;
 
-        repaint();
+        //repaint();
     }
 
     @Override

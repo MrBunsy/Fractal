@@ -14,6 +14,7 @@
 		<jar jarfile="dist/Fractal-with-libs.jar">
 			<zipfileset src="${dist.jar}" excludes="META-INF/*" />
 			<zipfileset src="dist/lib/LukesBits.jar" excludes="META-INF/*" />
+                        <zipfileset src="dist/lib/jargs.gnu.jar" excludes="META-INF/*" />
 			<manifest>
 				<attribute name="Main-Class" value="fractal.Fractal"/>
 			</manifest>

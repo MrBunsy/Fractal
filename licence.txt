@@ -1,0 +1,3 @@
+This source code (the bits I wrote) is copyright Luke Wallin 2012 and licenced under the LGPL.
+
+I am contactable at luke.wallin@gmail.com or via my website: www.lukewallin.co.uk
