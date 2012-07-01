@@ -463,7 +463,7 @@ public class Fractal {
                 
                 //String filename = (int) (System.currentTimeMillis() / 1000L)+"";
 
-                ImageIO.write(bufferImage, "png", new File(filename+".png"));
+                ImageIO.write(bufferImage, "png", new File("images/"+filename+".png"));
                 
                 if(!bigToo){
                     //this is the big image
@@ -471,10 +471,10 @@ public class Fractal {
                     //aaImage = Image.getScaledInstance(bufferImage, width, height, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);
                     BufferedImage aaImage = Image.getScaledInstance(bufferImage, width/upscale,height/upscale, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);
                     
-                    ImageIO.write(aaImage, "png", new File(filename+"_aa.png"));
+                    ImageIO.write(aaImage, "png", new File("images/"+filename+"_aa.png"));
                 }else{
                     //this is NOT the big image
-                    FileWriter fstream = new FileWriter(filename+".txt");
+                    FileWriter fstream = new FileWriter("images/"+filename+".txt");
                     BufferedWriter out = new BufferedWriter(fstream);
                     out.write(infoString());
                     //Close the output stream
