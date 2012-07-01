@@ -61,7 +61,7 @@ public class Fractal {
     
     private boolean allowSave,generationInProgress,needReGenerate;//,changingImage;
     
-    private boolean saveWhenFinished;
+    private boolean saveWhenFinished,aa,onlyAA;
     private String saveAs;
     
     private FractalThread[] fractalThreads;
@@ -85,6 +85,7 @@ public class Fractal {
         CmdLineParser.Option heightArg = parser.addIntegerOption('h', "height");
         CmdLineParser.Option threadsArg = parser.addIntegerOption('t', "threads");
         CmdLineParser.Option upScaleArg = parser.addIntegerOption('u', "upscale");
+        CmdLineParser.Option animationArg = parser.addBooleanOption('a', "animation");
         
         try {
             parser.parse(args);
@@ -97,11 +98,40 @@ public class Fractal {
         int height = (Integer) parser.getOptionValue(heightArg, 600);
         int threads = (Integer) parser.getOptionValue(threadsArg, 2);
         int upscale = (Integer) parser.getOptionValue(upScaleArg,4);
+        boolean animation = (Boolean) parser.getOptionValue(animationArg,false);
         
-        Fractal f = new Fractal(width, height,true,threads);
-        f.setUpscale(upscale);
-        FractalWindow w = new FractalWindow(f,width, height);
-        f.setWindow(w);
+        if(animation){
+            
+            String folderName=(int) (System.currentTimeMillis() / 1000L)+"";
+            new File("images/"+folderName).mkdir();
+            //Vector c = new Vector(-1.11,-0.26,0.0);
+            Vector c = new Vector(-1.10958164277272,-0.27535734081757735,0.0);
+            double z = 1.0;
+            for(int i=0;i<200;i++){
+                Fractal f = new Fractal(width*upscale, height*upscale, true, threads);
+                f.loadSettings(c, z, 1000);
+                f.setUpscale(upscale);
+                f.saveWhenFinished("/"+folderName+"/"+i);
+                f.generate();
+                //f.setAA(false);
+                f.setOnlyAA(true);
+                z*=0.9;
+                try {
+                    //massive bodge to get it to wait till the image has been written
+                    while(!f.ready()){
+                        Thread.sleep(100);
+                    }
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Fractal.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }else{
+        
+            Fractal f = new Fractal(width, height,true,threads);
+            f.setUpscale(upscale);
+            FractalWindow w = new FractalWindow(f,width, height);
+            f.setWindow(w);
+        }
     }
     
     public void key(int key){
@@ -173,6 +203,9 @@ public class Fractal {
         
         detail = 50;
         
+        aa=true;
+        onlyAA=false;
+        
         threads=_threads;
         
         System.out.println("Threads: "+threads);
@@ -203,6 +236,14 @@ public class Fractal {
         
     }
 
+    public void setAA(boolean _aa){
+        aa=_aa;
+    }
+    
+    public void setOnlyAA(boolean _aa){
+        onlyAA=_aa;
+    }
+    
     public void setUpscale(int _upscale){
         upscale=_upscale;
     }
@@ -280,7 +321,9 @@ public class Fractal {
 
             updateZoom(scroll);
             
-            Vector newOffset = mouseComplex.subtract(mouseScreen.multiply(zoom / (double) width));
+            //.add(new Vector(0,1),_zoom*(double)(width-height)/(2.0*(double)width)) is a bodge to get it to work when the aspect ratio isn't 1
+            //I'm not entirely sure what's happenning, but it works!
+            Vector newOffset = mouseComplex.subtract(mouseScreen.multiply(zoom / (double) width)).subtract(new Vector(0,1),zoom*(double)(width-height)/(2.0*(double)width));
             centre = newOffset.add(new Vector(zoom / 2.0, zoom / 2.0));
         } else {
             updateZoom(scroll);
@@ -298,8 +341,10 @@ public class Fractal {
     }
 
     private Vector offset(Vector _centre, double _zoom) {
-        Vector offset = _centre.subtract(new Vector(1, 1).multiply(_zoom / 2.0));
+        Vector offset = _centre.subtract(new Vector(1, 1).multiply(_zoom / 2.0));//(double)height/(double)width
 
+        offset = offset.add(new Vector(0,1),_zoom*(double)(width-height)/(2.0*(double)width));
+        
         return offset;
     }
 
@@ -462,16 +507,20 @@ public class Fractal {
 //                bigFractal.draw(bigGraphics);
                 
                 //String filename = (int) (System.currentTimeMillis() / 1000L)+"";
-
-                ImageIO.write(bufferImage, "png", new File("images/"+filename+".png"));
+                if(!onlyAA){
+                    //don't write this small one if we're after the AA version
+                    ImageIO.write(bufferImage, "png", new File("images/"+filename+".png"));
+                }
                 
                 if(!bigToo){
                     //this is the big image
                     //BufferedImage aaImage = new BufferedImage(width/upscale,height/upscale,BufferedImage.TYPE_INT_RGB);
                     //aaImage = Image.getScaledInstance(bufferImage, width, height, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);
-                    BufferedImage aaImage = Image.getScaledInstance(bufferImage, width/upscale,height/upscale, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);
-                    
-                    ImageIO.write(aaImage, "png", new File("images/"+filename+"_aa.png"));
+                    if(aa){
+                        BufferedImage aaImage = Image.getScaledInstance(bufferImage, width/upscale,height/upscale, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);
+
+                        ImageIO.write(aaImage, "png", new File("images/"+filename+"_aa.png"));
+                    }
                 }else{
                     //this is NOT the big image
                     FileWriter fstream = new FileWriter("images/"+filename+".txt");
@@ -495,7 +544,7 @@ public class Fractal {
     }
     
     private String infoString(){
-        return "Centre: " + centre + ", Zoom: " + zoom + ", Detail: "+detail;
+        return "Centre: (" + centre.x+","+centre.y + "), Zoom: " + zoom + ", Detail: "+detail;
     }
 
     public synchronized  void draw(Graphics g) {//,int width,int height
