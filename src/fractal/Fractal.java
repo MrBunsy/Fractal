@@ -34,7 +34,6 @@ public class Fractal {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
         Fractal f = new Fractal(600, 600);
     }
 
@@ -100,7 +99,7 @@ public class Fractal {
         generate();
     }
     
-    public void scroll(double scroll) {
+    public void scroll(int scroll) {
         Point m = window.getMousePosition();
 
         if (m != null) {
@@ -125,7 +124,7 @@ public class Fractal {
 
     }
     
-    private void updateZoom(double scroll){
+    private void updateZoom(int scroll){
         if (scroll < 0) {
                 zoom *= zoomAdjust;
             } else {

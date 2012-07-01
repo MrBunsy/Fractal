@@ -52,7 +52,7 @@ public class FractalWindow extends javax.swing.JFrame {
     }
 
     private void mouseWheel(java.awt.event.MouseWheelEvent evt) {
-        double scroll = evt.getPreciseWheelRotation();
+        int scroll = evt.getWheelRotation();//.getPreciseWheelRotation();
         fractal.scroll(scroll);
         repaint();
     }
