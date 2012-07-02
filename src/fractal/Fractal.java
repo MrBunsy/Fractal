@@ -152,8 +152,9 @@ public class Fractal {
             //Complex mu = new Complex(0.8,0.156);
             
             
-            //FunctionOfZ fz = new Julia(mu,Julia.ColourType.NONE);
-            FunctionOfZ fz = new Mandelbrot(30);
+            //FunctionOfZ fz = new Julia(mu,Julia.ColourType.COSINE);
+            //FunctionOfZ fz = new Mandelbrot(30);
+            FunctionOfZ fz = new BurningShip(30);
 
             //Fractal f = new Fractal(width * upscale, height * upscale, true, threads, FractalType.JULIA,fz);
             Fractal f = new Fractal(width, height, true, threads, fz);

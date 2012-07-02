@@ -61,7 +61,8 @@ public class Julia implements FunctionOfZ{
                 //return Colour.hsvToRgb(angle, 0.8, 1.0);
                 if(c.magnitudeSqrd() >= 4){
                     //escaped
-                    return Colour.red.dim(1-angle).toColor();
+                    //return Colour.red.dim(1-angle).toColor();
+                    return new Colour(255,255,255).toColor();
                 }else{
                     //non escaped
                     return Colour.blue.dim(1-angle).toColor();
