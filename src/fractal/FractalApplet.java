@@ -38,7 +38,8 @@ public class FractalApplet extends JApplet implements IFractalWindow, MouseWheel
      */
     public void init() {
         Dimension d =  getSize();
-        fractal = new Fractal(d.width, d.height,false,2,Fractal.Function.BURNINGSHIP);
+        FunctionOfZ fz = new Mandelbrot(30);
+        fractal = new Fractal(d.width, d.height,false,2,fz);
         fractal.setWindow(this);
         
         addMouseWheelListener(this);

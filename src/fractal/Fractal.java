@@ -23,6 +23,7 @@ import LukesBits.Complex;
 import LukesBits.Image;
 import LukesBits.Vector;
 import jargs.gnu.CmdLineParser;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.RenderingHints;
@@ -46,24 +47,28 @@ public class Fractal {
     private IFractalWindow window;
     private int width, height, detail, drawDetail, threads;
     private BufferedImage bufferImage;//,finishedImage;
-    private int[][] buffer;
-    private int minI, maxI, totalIs;
+    //private int[][] buffer;
+    //private Colour[][] buffer;
+    //private int minI, maxI, totalIs;
     private int threadsDrawnTo, finishedThreads;
-    private double averageI;
+    //private double averageI;
     //private Colour black = new Colour(0,0,0);
     private Vector centre, drawCentre;
     private double zoom, drawZoom;
     private double zoomAdjust = 0.8;
     //how much bigger to make hte big image when saving
     private int upscale;
-    private Function function;
+    private FractalType fractalType;
     private boolean allowSave, generationInProgress, needReGenerate;//,changingImage;
     private boolean saveWhenFinished, aa, onlyAA;
     private String saveAs;
     private FractalThread[] fractalThreads;
     private Thread[] threadClasses;
     //changes how often the colours repeat
-    private double cycleMultiplier;
+    //private double cycleMultiplier;
+    private Colour background;
+    
+    private FunctionOfZ functionOfZ;
 
     //parameter used for juliet sets
     private Complex juliaMu;
@@ -103,20 +108,35 @@ public class Fractal {
 
         if (animation) {
 
+            int upTo=500;
+            int skip=300;
+            
             String folderName = (int) (System.currentTimeMillis() / 1000L) + "";
             new File("images/" + folderName).mkdir();
             //Vector c = new Vector(-1.11,-0.26,0.0);
-            Vector c = new Vector(-1.10958164277272, -0.27535734081757735, 0.0);
-            double z = 1.0;
-            for (int i = 0; i < 200; i++) {
-                Fractal f = new Fractal(width * upscale, height * upscale, true, threads, Function.BURNINGSHIP);
+            //Vector c = new Vector(-1.10958164277272, -0.27535734081757735, 0.0);
+            Vector c = new Vector(-0.5699636380381331,-0.5617647004128065,0);
+            double z = 3.0;
+            for(int i=0;i<skip;i++){
+                z *= 0.95;
+            }
+            for (int i = skip; i < upTo; i++) {
+                
+                //FunctionOfZ fz = new Julia(new Complex(0.36237,0.32),Julia.ColourType.COSINE);
+                FunctionOfZ fz = new Mandelbrot(30);
+                
+                //Fractal f = new Fractal(width * upscale, height * upscale, true, threads, FractalType.JULIA,fz);
+                Fractal f = new Fractal(width * upscale, height * upscale, true, threads, fz);
                 f.loadSettings(c, z, 1000);
                 f.setUpscale(upscale);
                 f.saveWhenFinished("/" + folderName + "/" + i);
                 f.generate();
-                //f.setAA(false);
-                f.setOnlyAA(true);
-                z *= 0.9;
+                f.setAA(false);
+                //f.setOnlyAA(true);
+                
+                f.setBackground(new Colour(255,255,255));
+                
+                z *= 0.95;
                 try {
                     //massive bodge to get it to wait till the image has been written
                     while (!f.ready()) {
@@ -127,102 +147,86 @@ public class Fractal {
                 }
             }
         } else {
+            Complex mu = new Complex(0.36237,0.32);
+            //Complex mu = new Complex(0.285,0.01);
+            //Complex mu = new Complex(0.8,0.156);
+            
+            
+            //FunctionOfZ fz = new Julia(mu,Julia.ColourType.NONE);
+            FunctionOfZ fz = new Mandelbrot(30);
 
-            Fractal f = new Fractal(width, height, true, threads, Function.BURNINGSHIP);
+            //Fractal f = new Fractal(width * upscale, height * upscale, true, threads, FractalType.JULIA,fz);
+            Fractal f = new Fractal(width, height, true, threads, fz);
+            //f.setJulia(new Complex(0.36237,0.32), 10);
             
-            f.setJulia(new Complex(0.36237,0.32), 10);
-            
-            f.setCycleMultiplier(50);
+            //f.setCycleMultiplier(50);
             f.setUpscale(upscale);
             FractalWindow w = new FractalWindow(f, width, height);
             f.setWindow(w);
+            //f.setBackground(new Colour(255,255,255));
         }
     }
 
-    public static enum Function {
-
-        MANDELBROT, BURNINGSHIP, JULIET
+    public static enum FractalType {
+        MANDELBROT,  JULIA//BURNINGSHIP,
     }
 
-    public Fractal(int _width, int _height, boolean _allowSave, int _threads, Function _function) {
+    public Fractal(int _width, int _height, boolean _allowSave, int _threads,  FunctionOfZ _functionOfZ) {
         width = _width;
         height = _height;
-
         allowSave = _allowSave;
-
         upscale = 4;
-
         detail = 50;
-
         //which fractal
-        function = _function;
+        //fractalType = _fractalType;
+        //what actual f(z) is used
+        functionOfZ=_functionOfZ;
 
+        
+        
         aa = true;
         onlyAA = false;
-
         threads = _threads;
-
-        cycleMultiplier=30.0;
         
-        System.out.println("Threads: " + threads);
-
+        System.out.println("Threads: "+threads);
+        
+        background=new Colour(0,0,0);
+        //cycleMultiplier=30.0;
+        //System.out.println("Threads: " + threads);
         fractalThreads = new FractalThread[threads];
         threadClasses = new Thread[threads];
-
-        //origin = new Vector((double)width*0.75,(double)height/2.0);
-        //zoom = 2.0/(double)width;
 
         //the length of the real axis which stretches across the screen
         zoom = 3.0;
         //what value on the complex plain is in the centre of the screen
         centre = new Vector(-0.5, 0);
 
-
         bufferImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         //finishedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        buffer = new int[width][height];
-
-        //changingImage=false;
+        //buffer = new int[width][height];
+        //buffer = new Colour[width][height];
+        
         generationInProgress = false;
         needReGenerate = false;
-        //generate();
-
-        //window = new FractalWindow(this, width, height);
-
-
     }
 
-    public void setJulia(Complex mu, int n){
-        function=Function.JULIET;
-        juliaMu = mu;
-        detail=n;
-    }
-    
     public void key(int key) {
-
-//        int x=0;
-//        int y=0;
         //TODO WASD too?
         switch (key) {
             case java.awt.event.KeyEvent.VK_KP_DOWN:
             case java.awt.event.KeyEvent.VK_DOWN:
-                //down
-                //y+=1;
                 move(0, 1);
                 break;
             case java.awt.event.KeyEvent.VK_LEFT:
             case java.awt.event.KeyEvent.VK_KP_LEFT:
-                //x-=1;
                 move(-1, 0);
                 break;
             case java.awt.event.KeyEvent.VK_RIGHT:
             case java.awt.event.KeyEvent.VK_KP_RIGHT:
-                //x+=1;
                 move(1, 0);
                 break;
             case java.awt.event.KeyEvent.VK_UP:
             case java.awt.event.KeyEvent.VK_KP_UP:
-                //y-=1;
                 move(0, -1);
                 break;
             case java.awt.event.KeyEvent.VK_ADD:
@@ -235,9 +239,6 @@ public class Fractal {
                 save();
                 break;
         }
-//        if(x!=0 && y!=0){
-//            fractal.move(x, y);
-//        }
         window.repaint();
     }
 
@@ -251,9 +252,9 @@ public class Fractal {
         saveAs = _saveAs;
     }
 
-    public void setCycleMultiplier(double m){
-        cycleMultiplier=m;
-    }
+//    public void setCycleMultiplier(double m){
+//        cycleMultiplier=m;
+//    }
     
     public void loadSettings(Vector _centre, double _zoom, int _detail) {
         centre = _centre;
@@ -276,33 +277,67 @@ public class Fractal {
     public boolean ready() {
         return !generationInProgress;
     }
-
-    public Colour iterationToColour(int i) {
-
-        if (i == drawDetail) {
-            return new Colour(0, 0, 0);
-        }
-
-        //all these work:
-        //Colour c = Colour.hsvToRgb((double) (i % 50) / 50.0, 0.5, 1.0);
-        //Colour c = Colour.hsvToRgb((double) i/detail, 0.5, 1.0);
-        //Colour c = Colour.hsvToRgb((double) (i-minI)/(maxI-minI), 0.5, 1.0);
-
-        //idea - look at iteration range and work it out so that it repeats x times across that range?
-
-        //double cycles = 1;
-
-        //double cycleSize = (double)(maxI-minI)/cycles;
-        //double cycleSize = (double)(averageI-minI)/cycles;
-        double cycleSize = Math.log(maxI) * cycleMultiplier;
-
-        //Colour c = Colour.hsvToRgb((double) (i-minI)/averageI, 0.5, 1.0);
-        //Colour c = Colour.hsvToRgb((double)i%255/255, 0.5, 1.0);
-        //Colour c = Colour.hsvToRgb((double) (i-minI)%averageI/averageI, 0.5, 1.0);
-        //subtract something other than minI to change the colour start?
-        Colour c = Colour.hsvToRgb((double) (i - minI) % cycleSize / cycleSize, 0.8, 1.0);
-        return c;
+    
+    public void setBackground(Colour bg){
+        background=bg;
     }
+
+//    public Colour iterationToColour(int i) {
+//
+//        if (i == drawDetail || i == 0) {
+//            return background;
+//        }
+//        
+//        
+//
+//        //all these work:
+//        //Colour c = Colour.hsvToRgb((double) (i % 50) / 50.0, 0.5, 1.0);
+//        //Colour c = Colour.hsvToRgb((double) i/detail, 0.5, 1.0);
+//        //Colour c = Colour.hsvToRgb((double) (i-minI)/(maxI-minI), 0.5, 1.0);
+//
+//        //idea - look at iteration range and work it out so that it repeats x times across that range?
+//
+//        //double cycles = 1;
+//
+//        //double cycleSize = (double)(maxI-minI)/cycles;
+//        //double cycleSize = (double)(averageI-minI)/cycles;
+//        //double cycleSize = Math.log(maxI) * cycleMultiplier;
+//
+//        //double colour;// = (double) (i - minI) % cycleSize / cycleSize;
+//        Colour c;// = Colour.hsvToRgb(colour, 0.8, 1.0);
+//        
+//        switch(fractalType){
+//            case JULIA:
+//            {
+//                //get from 0->max value back to 0->1
+//                
+//                double colour = (double)i/(double)Integer.MAX_VALUE;
+//                
+//                //c = new Colour((int)Math.round(255.0*colour), (int)Math.round(255.0*colour), 0);
+//                c = Colour.hsvToRgb(colour, 0.75, 1.0);
+//                
+//                
+//                
+//                break;
+//            }
+//            case MANDELBROT:
+//            default:
+//            {
+//                double cycleSize = Math.log(drawDetail) * cycleMultiplier;
+//
+//                double colour = (double) i % cycleSize / cycleSize;// - minI)
+//                c = Colour.hsvToRgb(colour, 0.8, 1.0);
+//            }
+//                break;
+//        }
+//        
+//        //Colour c = Colour.hsvToRgb((double) (i-minI)/averageI, 0.5, 1.0);
+//        //Colour c = Colour.hsvToRgb((double)i%255/255, 0.5, 1.0);
+//        //Colour c = Colour.hsvToRgb((double) (i-minI)%averageI/averageI, 0.5, 1.0);
+//        //subtract something other than minI to change the colour start?
+//        
+//        return c;
+//    }
 
     //taking ints where they are either -1,0 or 1, so the current zoom level is taken into account
     public void move(int x, int y) {
@@ -311,10 +346,16 @@ public class Fractal {
     }
 
     public void changeDetail(boolean more) {
+        
+        double m=5;
+        //scale less if drawing a julia
+        if(fractalType==FractalType.JULIA){
+            m=2;
+        }
         if (more) {
-            detail *= 5;
+            detail *= m;
         } else {
-            detail /= 5;
+            detail /= m;
         }
 
         generate();
@@ -374,31 +415,33 @@ public class Fractal {
     }
 
     //set max/min and add up totals
-    private synchronized void setIStuff(int i) {
-        if (i < minI) {
-            minI = i;
-        }
-
-        if (i > maxI) {
-            maxI = i;
-        }
-
-        totalIs += i;
-    }
+//    private synchronized void setIStuff(int i) {
+//        if (i < minI) {
+//            minI = i;
+//        }
+//
+//        if (i > maxI) {
+//            maxI = i;
+//        }
+//
+//        totalIs += i;
+//    }
 
     public void generateStrip(int x1, int x2) {
+        Vector offset = offset(drawCentre, drawZoom);
+        double adjustedZoom = drawZoom / (double) width;
         for (int x = x1; x < x2; x++) {
             for (int y = 0; y < height; y++) {
-                //Colour colour;
+                Color colour;
 
                 Vector p = new Vector(x, height - y - 1);
 
                 //get p to be relative to offset in the complex plain
-                p = p.multiply(drawZoom / (double) width);
+                p = p.multiply(adjustedZoom);
 
                 //offset is the top left on the viewport on the complex plain
                 //Vector offset = offset();
-                p = p.add(offset(drawCentre, drawZoom));
+                p = p.add(offset);
                 //p=p.subtract(new Vector(zoom/2.0,zoom/2.0));//origin.add(
 
 
@@ -406,45 +449,49 @@ public class Fractal {
 
                 Complex z = new Complex(0, 0);
 
-                int i = 0;
+                //int i = 0;
 
 
-                switch (function) {
-                    case MANDELBROT:
-                        while (z.magnitudeSqrd() < 4 && i < drawDetail) {
-                            z = z.times(z).plus(c);
-                            i++;
-                        }
-                        break;
-                    case BURNINGSHIP:
-                        while (z.magnitudeSqrd() < 4 && i < drawDetail) {
-                            Complex q = new Complex(Math.abs(z.re()), Math.abs(z.im()));
-                            z = q.times(q).plus(c);
-                            i++;
-                        }
-                        break;
-                    case JULIET:
-                        while (c.magnitudeSqrd() < 4 && i < drawDetail) {
-                            c = c.times(c).plus(juliaMu);
-                            i++;
-                        }
-                        
-//                        if(c.magnitudeSqrd() < 4){
-//                            
-//                        }else{
-//                            i=0;
+//                switch (fractalType) {
+//                    case MANDELBROT:
+//                        while (z.magnitudeSqrd() < 4 && i < drawDetail) {
+//                            z = z.times(z).plus(c);
+//                            i++;
 //                        }
-                        if(c.magnitudeSqrd() >= 4){
-                            //outside julia set
-                            i=0;
-                        }
-                        break;
+                        colour = functionOfZ.iterations(z, c, drawDetail);
+//                        break;
+////                    case BURNINGSHIP:
+////                        while (z.magnitudeSqrd() < 4 && i < drawDetail) {
+////                            Complex q = new Complex(Math.abs(z.re()), Math.abs(z.im()));
+////                            z = q.times(q).plus(c);
+////                            i++;
+////                        }
+////                        break;
+//                    case JULIA:
+//                    default:
+////                        while (c.magnitudeSqrd() < 4 && i < drawDetail) {
+////                            c = c.times(c).plus(juliaMu);
+////                            i++;
+////                        }
+//                        colour = functionOfZ.iterations(z, c, drawDetail);
+//                        
+////                        if(c.magnitudeSqrd() < 4){
+////                            
+////                        }else{
+////                            i=0;
+////                        }
+////                        if(c.magnitudeSqrd() >= 4){
+////                            //outside julia set
+////                            i=0;
+////                        }
+//                        break;
+//
+//                }
 
-                }
+                //setIStuff(i);
 
-                setIStuff(i);
-
-                buffer[x][height - y - 1] = i;
+                //buffer[x][height - y - 1] = colour;
+                bufferImage.setRGB(x, height - y - 1, colour.getRGB());
             }
         }
     }
@@ -454,14 +501,14 @@ public class Fractal {
         if (!generationInProgress) {
             generationInProgress = true;
             needReGenerate = false;
-            minI = detail;
-            maxI = 0;
+//            minI = detail;
+//            maxI = 0;
 
             drawDetail = detail;
             drawCentre = centre.copy();
             drawZoom = zoom;
 
-            totalIs = 0;
+            //totalIs = 0;
 
             finishedThreads = 0;
 
@@ -500,8 +547,8 @@ public class Fractal {
 
         if (finishedThreads >= threads) {
             //all of them finished!
-            averageI = (double) totalIs / (double) (width * height);
-            bufferToImage();
+            //averageI = (double) totalIs / (double) (width * height);
+            //bufferToImage();
             if (window != null) {
                 window.repaint();
             }
@@ -518,15 +565,16 @@ public class Fractal {
     }
 
     //take the iteration values in the buffer and create the image;
-    private synchronized void bufferToImage() {
-        //changingImage=true;
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                bufferImage.setRGB(x, y, iterationToColour(buffer[x][y]).toColor().getRGB());
-            }
-        }
-        //changingImage=false;
-    }
+//    private synchronized void bufferToImage() {
+//        //changingImage=true;
+//        for (int x = 0; x < width; x++) {
+//            for (int y = 0; y < height; y++) {
+//                //bufferImage.setRGB(x, y, iterationToColour(buffer[x][y]).toColor().getRGB());
+//                bufferImage.setRGB(x, y, buffer[x][y].toColor().getRGB());
+//            }
+//        }
+//        //changingImage=false;
+//    }
 
     public void save() {
         save((int) (System.currentTimeMillis() / 1000L) + "", true);
@@ -537,12 +585,13 @@ public class Fractal {
             try {
                 if (bigToo) {
                     //BufferedImage bigImage = new BufferedImage(width*upscale,height*upscale,BufferedImage.TYPE_INT_RGB);
-                    Fractal bigFractal = new Fractal(width * upscale, height * upscale, allowSave, threads, function);
+                    Fractal bigFractal = new Fractal(width * upscale, height * upscale, allowSave, threads,functionOfZ);
 
                     bigFractal.loadSettings(centre, zoom, detail);
                     bigFractal.saveWhenFinished(filename + "_big");
                     bigFractal.setUpscale(upscale);
-
+                    bigFractal.setBackground(background);
+                    
                     bigFractal.generate();
                 }
 
@@ -599,11 +648,12 @@ public class Fractal {
 
     private String infoString(boolean detailed) {
         
-        return "Centre: "+(detailed ? "(" + centre.x + "," + centre.y + ")" : centre)+","+
-                "Zoom: " + zoom + ","+
-                "Detail: " + detail + ","
-                +"Function: "+function.toString()+", "+
-                (detailed ? "ColourCycleMultiplier: "+cycleMultiplier : "");
+        return "Centre: "+(detailed ? "(" + centre.x + "," + centre.y + ")" : centre)+", "+
+                "Zoom: " + zoom + ", "+
+                "Detail: " + detail + ", "+
+                //"Type: "+fractalType.toString()+", "+
+                "Function: " + functionOfZ.toString();
+                //(detailed ? "ColourCycleMultiplier: "+cycleMultiplier : "");
     }
 
     public synchronized void draw(Graphics g) {//,int width,int height
