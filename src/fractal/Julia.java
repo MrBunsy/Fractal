@@ -58,14 +58,22 @@ public class Julia implements FunctionOfZ{
 
                 //bodge to get colouring mechanism to work right with only using ints
                 //i = (int)Math.round(angle * Integer.MAX_VALUE);
-                //return Colour.hsvToRgb(angle, 0.8, 1.0);
+                //return Colour.hsvToRgb(angle, 0.8, 1.0).toColor();
+                //return Color.getHSBColor((float)angle, 0.8f, 1.0f);
                 if(c.magnitudeSqrd() >= 4){
-                    //escaped
+                    //escaped - colour like the mandelbrot
                     //return Colour.red.dim(1-angle).toColor();
-                    return new Colour(255,255,255).toColor();
+                    //return new Colour(255,255,255).toColor();
+                    
+                     double cycleSize = Math.log(detail) * 10;
+
+                     double co = (double) i % cycleSize / cycleSize;
+                    
+                    return Color.getHSBColor((float)co, 0.5f, 1.0f);
                 }else{
                     //non escaped
-                    return Colour.blue.dim(1-angle).toColor();
+                    //return Colour.blue.dim(1-angle).toColor();
+                    return Color.getHSBColor((float)angle, 0.8f, 1.0f);
                 }
                 
             case NONE:
