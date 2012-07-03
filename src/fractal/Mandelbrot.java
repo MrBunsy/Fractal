@@ -25,19 +25,42 @@ public class Mandelbrot implements FunctionOfZ{
         return z.times(z).plus(c);
     }
     
+    public static boolean isPointIn(Complex c){
+        return isPointIn(c, 1000000);
+    }
+    
+    //is a point in the mandelbrot set?
+    public static boolean isPointIn(Complex c, int detail){
+        int i=0;
+        Complex z = new Complex(0,0);
+        
+        while (z.magnitudeSqrd() < 4 && i < detail) {
+            z = z.times(z).plus(c);
+            i++;
+        }
+        //if i is less than detail then we escaped, if not we're assuming we won't escape
+        return i<detail;
+    }
+    
     @Override
     public Color iterations(Complex z, Complex c, int detail) {
         int i=0;
         double s=0;
+        
+        //Complex oldZ=z;
+        
         while (z.magnitudeSqrd() < 4 && i < detail) {
+            //oldZ=z;
             z = newZ(z,c);
             i++;
             //this is for smooth colouring - http://www.hiddendimension.com/FractalMath/Divergent_Fractals_Main.html
             //does slow things down a lot though
-            if(smoothColour){
-                s = s + Math.exp(-z.abs());
-            }
+//            if(smoothColour){
+//                s = s + Math.exp(-z.abs());
+//            }
         }
+        
+        
         
         if(i==detail){
             //escaped
@@ -47,6 +70,14 @@ public class Mandelbrot implements FunctionOfZ{
         if(!smoothColour){
             //just using iteration, not the funky (but slow) smooth colour value
             s = (double)i;
+        }else{
+            // extra incrementations seems to help the smoothness - http://www.codeproject.com/Articles/18361/Mandelbrot-Set-with-Smooth-Drawing
+            //don't know why :/
+            //TODO work out why?
+            z = newZ(z,c); i++;
+            z = newZ(z,c); i++;
+            z = newZ(z,c); i++;
+            s=(double)i - Math.log(Math.log(z.abs()))/Math.log(2.0);// + 1.0
         }
         
         //if(true){

@@ -67,16 +67,21 @@ public class Julia implements FunctionOfZ{
                     //escaped - colour like the mandelbrot
                     //return Colour.red.dim(1-angle).toColor();
                     //return new Colour(255,255,255).toColor();
+                    c = c.times(c).plus(mu);i++;
+                    c = c.times(c).plus(mu);i++;
                     
-                     double cycleSize = Math.log(detail) * 10;
+                     double s=(double)i - Math.log(Math.log(c.abs()))/Math.log(2.0);// + 1.0
+                    
+                     double cycleSize = Math.log(detail) * 50;
 
-                     double co = (double) i % cycleSize / cycleSize;
+                     double co = ( s + cycleSize/2) % cycleSize / cycleSize;
                     
-                    return Color.getHSBColor((float)co, 0.5f, 1.0f);
+                     return Color.getHSBColor((float)co, 0.5f, 1.0f);
+                     //return Colour.red.dim(s).toColor();
                 }else{
                     //non escaped
-                    //return Colour.blue.dim(1-angle).toColor();
-                    return Color.getHSBColor((float)(angle/Math.PI), 0.8f, 1.0f);
+                    return Colour.blue.dim(1.0-angle/Math.PI).toColor();
+                    //return Color.getHSBColor((float)(angle/Math.PI), 0.8f, 1.0f);
                 }
                 
             case NONE:

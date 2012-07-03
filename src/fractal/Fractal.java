@@ -32,6 +32,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -108,8 +109,8 @@ public class Fractal {
 
         if (animation) {
 
-            int upTo=500;
-            int skip=300;
+            int upTo=1000;
+            int skip=500;
             
             String folderName = (int) (System.currentTimeMillis() / 1000L) + "";
             new File("images/" + folderName).mkdir();
@@ -147,14 +148,27 @@ public class Fractal {
                 }
             }
         } else {
-            Complex mu = new Complex(0.36237,0.32);
+            //Complex mu = new Complex(0.36237,0.32);
             //Complex mu = new Complex(0.285,0.01);
             //Complex mu = new Complex(0.8,0.156);
+            //Complex mu = new Complex(-0.726895347709114071439, 0.188887129043845954792);//very pretty - top of wiki page
+            Complex mu = new Complex(-0.8,0.156);
+            //Complex mu = new Complex(-0.74543,0.11301);
+            //Complex mu = new Complex(-0.4,0.6);
+//            Random random = new Random(9323222);
+//            
+//            Complex mu;
+//            
+//            //find a random point in the mandelbrot set
+//            do{
+//                mu = new Complex(random.nextDouble()*4d-2d, random.nextDouble()*4d-2d);
+//            }
+//            while(!Mandelbrot.isPointIn(mu));
             
             
-            //FunctionOfZ fz = new Julia(mu,Julia.ColourType.COSINE);
+            FunctionOfZ fz = new Julia(mu,Julia.ColourType.COSINE);
             //FunctionOfZ fz = new Mandelbrot(30,true);
-            FunctionOfZ fz = new BurningShip(30,true);
+            //FunctionOfZ fz = new BurningShip(30,true);
 
             //Fractal f = new Fractal(width * upscale, height * upscale, true, threads, FractalType.JULIA,fz);
             Fractal f = new Fractal(width, height, true, threads, fz);
