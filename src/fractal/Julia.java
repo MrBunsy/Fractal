@@ -54,7 +54,10 @@ public class Julia implements FunctionOfZ{
                 double angle = Math.atan2(p.im(),p.re());
 
                 //square, so force range to be +ve
-                angle *= angle;
+                //angle *= angle;
+                if(angle < 0){
+                    angle+=Math.PI;
+                }
 
                 //bodge to get colouring mechanism to work right with only using ints
                 //i = (int)Math.round(angle * Integer.MAX_VALUE);
@@ -73,7 +76,7 @@ public class Julia implements FunctionOfZ{
                 }else{
                     //non escaped
                     //return Colour.blue.dim(1-angle).toColor();
-                    return Color.getHSBColor((float)angle, 0.8f, 1.0f);
+                    return Color.getHSBColor((float)(angle/Math.PI), 0.8f, 1.0f);
                 }
                 
             case NONE:

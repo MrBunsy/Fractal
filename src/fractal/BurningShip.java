@@ -9,34 +9,23 @@ import java.awt.Color;
 /**
  *
  * @author Luke
+ * 
+ * everything except f(z) is the same as the mandelbrot, so this just extends it and overrides newZ
+ * 
  */
-public class BurningShip implements FunctionOfZ{
-    private double cycleMultiplier;
+public class BurningShip extends Mandelbrot{
     
-    public BurningShip(double _cycleMultiplier){
-        cycleMultiplier=_cycleMultiplier;
+    public BurningShip(double _cycleMultiplier,boolean _smoothColour){
+        super(_cycleMultiplier, _smoothColour);
     }
     
     @Override
-    public Color iterations(Complex z, Complex c, int detail) {
-        int i=0;
-        while (z.magnitudeSqrd() < 4 && i < detail) {
-            Complex q = new Complex(Math.abs(z.re()), Math.abs(z.im()));
-            z = q.times(q).plus(c);
-            i++;
-        }
-        
-        if(i==detail){
-            return new Color(0,0,0);
-        }
-        
-        double cycleSize = Math.log(detail) * cycleMultiplier;
-
-        double colour = (double) i % cycleSize / cycleSize;
-        //return Colour.hsvToRgb(colour, 0.8, 1.0);
-        return Color.getHSBColor((float)colour, 0.8f, 1.0f);
+     protected Complex newZ(Complex z, Complex c){
+         Complex q = new Complex(Math.abs(z.re()), Math.abs(z.im()));
+         return q.times(q).plus(c);
     }
     
+    @Override
     public String toString(){
         return "f(z) = (|Re(z)| + i|Im(z)|)^2 + c, CycleMultiplier: "+cycleMultiplier;
     }
