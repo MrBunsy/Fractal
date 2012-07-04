@@ -27,8 +27,6 @@ public class FractalPanel extends javax.swing.JPanel implements IFractalWindow {
             }
         });
 
-        
-
         addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
                 _mouseReleased(evt);
@@ -38,7 +36,8 @@ public class FractalPanel extends javax.swing.JPanel implements IFractalWindow {
             }
         });
 
-
+        
+        
         setVisible(true);
     }
     

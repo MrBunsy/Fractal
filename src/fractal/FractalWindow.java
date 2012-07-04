@@ -45,7 +45,7 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
     //private JMenu fractalMenu,colourMenu,exportMenu;
     //private JMenuItem fractalMenu_mandelbrot,fractalMenu_julia,fractalMenu_customMandelbrot,fractalMenu_customJulia;
     private JLabel statusLabel;
-    private Dimension oldDims;
+    //private Dimension oldDims;
     
     public FractalWindow(Fractal _fractal, int width, int height){
         panel = new FractalPanel(_fractal, width, height);
@@ -87,6 +87,8 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
         //setSize(new java.awt.Dimension(width, height));
         setVisible(true);
         
+        
+
         addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 key(evt);
@@ -130,10 +132,7 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
         setJMenuBar(menuBar);
     }
     
-    private void key(java.awt.event.KeyEvent evt) {
-        int key = evt.getKeyCode();
-        fractal.key(key);
-    }
+    
     
     public void paint(Graphics g){
         super.paint(g);
@@ -142,6 +141,11 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
         }else{
             statusLabel.setText("Generating...");
         }
+    }
+    
+    private void key(java.awt.event.KeyEvent evt) {
+        int key = evt.getKeyCode();
+        fractal.key(key);
     }
     
 //    public void validate(){
