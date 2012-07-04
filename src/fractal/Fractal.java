@@ -46,6 +46,9 @@ import javax.swing.ProgressMonitor;
  * 
  * 
  * TODO - MASSIVELY tidy up the saving mechanism, so I can get feedback and it makes sense.
+ * -done :D
+ * 
+ * TODO - cancel a generation and start again if something changes?
  */
 public class Fractal {
 
@@ -193,6 +196,10 @@ public class Fractal {
 
     //this is for a fractal that will be saved as soon as it's generated
     public Fractal(int _width, int _height, int _threads, FunctionOfZ _functionOfZ, int _detail, double _zoom, Vector _centre, String _saveAs, boolean _aa){
+        this(_width, _height, _threads, _functionOfZ, _detail, _zoom, _centre, _saveAs, _aa, null);
+    }
+    
+    public Fractal(int _width, int _height, int _threads, FunctionOfZ _functionOfZ, int _detail, double _zoom, Vector _centre, String _saveAs, boolean _aa, ProgressMonitor _progMon){
         width = _width;
         height = _height;
         threads = _threads;
@@ -204,6 +211,8 @@ public class Fractal {
         saveWhenFinished=true;
         saveAs=_saveAs;
         aa=_aa;
+        
+        progressMonitor=_progMon;
         
         init();
         
@@ -458,13 +467,19 @@ public class Fractal {
             drawZoom = zoom;
             finishedThreads = 0;
 
+            if(progressMonitor!=null){
+                //extra one if we're using AA
+                progressMonitor.setMaximum(width + (aa ? 1 : 0));
+                progressMonitor.setNote("Generating Image");
+            }
+            
             //what xcoord has been drawn up to
             threadsDrawnTo = 0;
 
             for (int t = 0; t < threads; t++) {
                 int drawTo =threadsDrawnTo + 2;
-                if(drawTo >=width){
-                    drawTo=width-1;
+                if(drawTo >width){
+                    drawTo=width;
                 }
                 fractalThreads[t] = new FractalThread(this, threadsDrawnTo, drawTo, t);
                 threadClasses[t] = new Thread(fractalThreads[t]);
@@ -479,7 +494,12 @@ public class Fractal {
 
     public synchronized void threadFinished(int id) {
         if (threadsDrawnTo < width) {
-            fractalThreads[id].newXs(threadsDrawnTo, threadsDrawnTo + 1);
+            int drawTo =threadsDrawnTo + 2;
+                if(drawTo >width){
+                    drawTo=width;
+                }
+            
+            fractalThreads[id].newXs(threadsDrawnTo, drawTo);
             threadClasses[id] = new Thread(fractalThreads[id]);
             threadClasses[id].start();
             threadsDrawnTo++;
@@ -490,6 +510,10 @@ public class Fractal {
         if(window!=null){
             //saving a fractal doesn't necessarily mean it had a window - the big version to be AA for example
             window.repaint();
+        }
+        
+        if(progressMonitor !=null){
+            progressMonitor.setProgress(threadsDrawnTo);
         }
         
         if (finishedThreads >= threads) {
@@ -510,34 +534,44 @@ public class Fractal {
         }
     }
 
+    //get a default file name
+    public String getFileName(){
+         return "images/"+(int) (System.currentTimeMillis() / 1000L);
+    }
+    
     //old-style save, saves useful stuff: imagebuffer, info and AA version
     public void save() {
+        String filename = getFileName();
         
-        String filename = "images/"+(int) (System.currentTimeMillis() / 1000L);
         save(filename,false,true);
         //the larger image
         //saveBig(filename,upscale,false);
         //the larger image AA
-        saveBig(filename+"_aa",upscale,true);
+        saveBig(filename+"_aa",upscale,true,null);
     }
 
     public void saveBig(String filename){
-        saveBig(filename,upscale,true);
+        saveBig(filename,upscale,true,null);
     }
     
-    public void saveBig(String filename, int scale, boolean _aa){
+    public void saveBig(String filename, int scale, boolean _aa, ProgressMonitor pm){
         //this should be auto-saved
-        Fractal f = new Fractal(width*scale, height*scale, threads, functionOfZ, detail, zoom, centre, filename, _aa);
-        f.setProgressMonitor(progressMonitor);
+        Fractal f = new Fractal(width*scale, height*scale, threads, functionOfZ, detail, zoom, centre, filename, _aa,pm);
+        //f.setProgressMonitor(progressMonitor);
+        f.setUpscale(scale);
     }
     
     public void save(String filename, boolean aa,boolean info) {
             try {
 
                 if(aa){
+                    if(progressMonitor!=null){
+                        progressMonitor.setNote("Resizing Image");
+                    }
                     //rescaled image
                     BufferedImage aaImage = Image.getScaledInstance(bufferImage, width / upscale, height / upscale, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);
                     ImageIO.write(aaImage, "png", new File( filename + ".png"));
+                    progressMonitor.setProgress(width+1);
                 }else{
                     //just the straight buffer
                     ImageIO.write(bufferImage, "png", new File(filename + ".png"));

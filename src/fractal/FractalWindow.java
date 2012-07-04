@@ -43,7 +43,8 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
     private FractalPanel panel;
     private JPanel progressPanel;
     //private JDialog progDialog;
-    private JProgressBar progBar;
+    //private JProgressBar progBar;
+    private ProgressMonitor progressMonitor;
     //private JMenuBar menuBar;
     //private JMenu fractalMenu,colourMenu,exportMenu;
     //private JMenuItem fractalMenu_mandelbrot,fractalMenu_julia,fractalMenu_customMandelbrot,fractalMenu_customJulia;
@@ -53,6 +54,8 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
     private int width;
     
     private ProgressMonitor progMon;
+    
+    private final JFrame thisPanel = this;
     
     public FractalWindow(Fractal _fractal, int width, int height){
         panel = new FractalPanel(_fractal, width, height);
@@ -172,6 +175,8 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
     }
     
     private void setupMenus(){
+        
+        
         JMenuBar menuBar=new JMenuBar();
         
         JMenu fractalMenu = new JMenu("Fractal");
@@ -242,12 +247,38 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
         
         // ------------------- Export Menu -------------------
         
-        JMenuItem standardExport = new JMenuItem("Default PNG");
+        JMenuItem standardExport = new JMenuItem("Standard");
         exportMenu.add(standardExport);
         standardExport.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 fractal.save();
+            }
+        });
+        
+        JMenuItem aa4Export = new JMenuItem("4xAA");
+        exportMenu.add(aa4Export);
+        aa4Export.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+                String filename = fractal.getFileName()+"_4aa";
+                progressMonitor = new ProgressMonitor(thisPanel, "Exporting to "+filename+".png", null, 0, width+1);
+                progressMonitor.setMillisToDecideToPopup(0);
+                fractal.saveBig(filename, 4, true,progressMonitor);
+            }
+        });
+        
+        JMenuItem aa8Export = new JMenuItem("8xAA");
+        exportMenu.add(aa8Export);
+        aa8Export.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+                String filename = fractal.getFileName()+"_8aa";
+                progressMonitor = new ProgressMonitor(thisPanel, "Exporting to "+filename+".png", null, 0, width+1);
+                progressMonitor.setMillisToDecideToPopup(0);
+                fractal.saveBig(filename, 8, true,progressMonitor);
             }
         });
         
