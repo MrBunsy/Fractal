@@ -227,6 +227,24 @@ public class Fractal {
         needReGenerate = false;
     }
 
+    //load the standard mandelbrot
+    public void loadMandelbrot(){
+        functionOfZ = new Mandelbrot(30,true);
+        centre = new Vector(-0.5, 0);
+        zoom = 3.0;
+        generate();
+        window.repaint();
+    }
+    
+    public void loadJuliaQuadratic(){
+        functionOfZ = new Julia(new Complex(-0.726895347709114071439, 0.188887129043845954792), Julia.ColourType.COSINE);
+        centre = new Vector(0,0);
+        zoom = 3d;
+        detail=1000;
+        generate();
+        window.repaint();
+    }
+    
     public void key(int key) {
         //TODO WASD too?
         switch (key) {
@@ -483,10 +501,14 @@ public class Fractal {
             threadsDrawnTo = 0;
 
             for (int t = 0; t < threads; t++) {
-                fractalThreads[t] = new FractalThread(this, threadsDrawnTo, threadsDrawnTo + 1, t);
+                int drawTo =threadsDrawnTo + 2;
+                if(drawTo >=width){
+                    drawTo=width-1;
+                }
+                fractalThreads[t] = new FractalThread(this, threadsDrawnTo, drawTo, t);
                 threadClasses[t] = new Thread(fractalThreads[t]);
                 threadClasses[t].start();
-                threadsDrawnTo++;
+                threadsDrawnTo+=2;
             }
         } else {
             needReGenerate = true;
@@ -506,7 +528,9 @@ public class Fractal {
             //finished!
             finishedThreads++;
         }
-
+        
+        window.repaint();
+        
         if (finishedThreads >= threads) {
             //all of them finished!
             if (window != null) {

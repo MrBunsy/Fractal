@@ -26,8 +26,12 @@
 package fractal;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
 /**
  *
@@ -37,8 +41,9 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
     
     private Fractal fractal;
     private FractalPanel panel;
-    private JMenuBar menuBar;
-    private JMenu fractalMenu,colourMenu,exportMenu;
+    //private JMenuBar menuBar;
+    //private JMenu fractalMenu,colourMenu,exportMenu;
+    //private JMenuItem fractalMenu_mandelbrot,fractalMenu_julia,fractalMenu_customMandelbrot,fractalMenu_customJulia;
     private JLabel statusLabel;
     private Dimension oldDims;
     
@@ -52,17 +57,7 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
         setResizable(false);
         
         
-        menuBar=new JMenuBar();
-        
-        fractalMenu = new JMenu("Fractal");
-        colourMenu = new JMenu("Colour");
-        exportMenu = new JMenu("Export");
-        
-        menuBar.add(fractalMenu);
-        menuBar.add(colourMenu);
-        menuBar.add(exportMenu);
-        
-        setJMenuBar(menuBar);
+        setupMenus();
         
         //height+=menuBar.getHeight();
         
@@ -98,6 +93,41 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
             }
         });
         
+    }
+    
+    private void setupMenus(){
+        JMenuBar menuBar=new JMenuBar();
+        
+        JMenu fractalMenu = new JMenu("Fractal");
+        JMenu colourMenu = new JMenu("Colour");
+        JMenu exportMenu = new JMenu("Export");
+        
+        //option to load hte default mandelbrot
+        JMenuItem loadMandelbrot = new JMenuItem("Mandelbrot");
+        fractalMenu.add(loadMandelbrot);
+        loadMandelbrot.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fractal.loadMandelbrot();
+            }
+        });
+        
+        JMenuItem loadJulia = new JMenuItem("Julia Quadratic");
+        fractalMenu.add(loadJulia);
+        loadJulia.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fractal.loadJuliaQuadratic();
+            }
+        });
+        
+        
+        
+        menuBar.add(fractalMenu);
+        menuBar.add(colourMenu);
+        menuBar.add(exportMenu);
+        
+        setJMenuBar(menuBar);
     }
     
     private void key(java.awt.event.KeyEvent evt) {
