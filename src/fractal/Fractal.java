@@ -36,6 +36,7 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.swing.ProgressMonitor;
 
 /**
  *
@@ -62,9 +63,8 @@ public class Fractal {
     private double zoomAdjust = 0.8;
     //how much bigger to make hte big image when saving
     private int upscale;
-    private FractalType fractalType;
     private boolean allowSave, generationInProgress, needReGenerate;//,changingImage;
-    private boolean saveWhenFinished, aa, onlyAA;
+    private boolean saveWhenFinished, aa;//, onlyAA;
     private String saveAs;
     private FractalThread[] fractalThreads;
     private Thread[] threadClasses;
@@ -75,6 +75,8 @@ public class Fractal {
     private boolean isSaving;
     
     private FunctionOfZ functionOfZ;
+    
+    private ProgressMonitor progressMonitor;
 
     //parameter used for juliet sets
     private Complex juliaMu;
@@ -134,13 +136,13 @@ public class Fractal {
                 //Fractal f = new Fractal(width * upscale, height * upscale, true, threads, FractalType.JULIA,fz);
                 Fractal f = new Fractal(width * upscale, height * upscale, true, threads, fz);
                 f.loadSettings(c, z, 1000);
-                f.setUpscale(upscale);
+                //f.setUpscale(upscale);
                 f.saveWhenFinished("/" + folderName + "/" + i);
                 f.generate();
                 f.setAA(false);
                 //f.setOnlyAA(true);
                 
-                f.setBackground(new Colour(255,255,255));
+                //f.setBackground(new Colour(255,255,255));
                 
                 z *= 0.95;
                 try {
@@ -189,49 +191,73 @@ public class Fractal {
         }
     }
 
-    public static enum FractalType {
-        MANDELBROT,  JULIA//BURNINGSHIP,
+    //this is for a fractal that will be saved as soon as it's generated
+    public Fractal(int _width, int _height, int _threads, FunctionOfZ _functionOfZ, int _detail, double _zoom, Vector _centre, String _saveAs, boolean _aa){
+        width = _width;
+        height = _height;
+        threads = _threads;
+        functionOfZ=_functionOfZ;
+        detail=_detail;
+        zoom=_zoom;
+        centre=_centre;
+        
+        saveWhenFinished=true;
+        saveAs=_saveAs;
+        aa=_aa;
+        
+        init();
+        
+        generate();
     }
-
-    public Fractal(int _width, int _height, boolean _allowSave, int _threads,  FunctionOfZ _functionOfZ) {
+    
+    public Fractal(int _width, int _height, int _threads, FunctionOfZ _functionOfZ, int _detail, double _zoom, Vector _centre ){
+        width = _width;
+        height = _height;
+        threads = _threads;
+        functionOfZ=_functionOfZ;
+        detail=_detail;
+        zoom=_zoom;
+        centre=_centre;
+        
+        saveWhenFinished=false;
+        aa=false;
+        
+        init();
+    }
+    
+    //TODO, cull this later?
+    public Fractal(int _width, int _height, boolean _allowSave, int _threads, FunctionOfZ _functionOfZ) {
         width = _width;
         height = _height;
         allowSave = _allowSave;
-        upscale = 4;
+        //upscale = 4;
         detail = 50;
-        //which fractal
-        //fractalType = _fractalType;
-        //what actual f(z) is used
         functionOfZ=_functionOfZ;
 
-        isSaving=false;
-        
         aa = true;
-        onlyAA = false;
         threads = _threads;
         
-        System.out.println("Threads: "+threads);
-        
-        background=new Colour(0,0,0);
-        //cycleMultiplier=30.0;
-        //System.out.println("Threads: " + threads);
-        fractalThreads = new FractalThread[threads];
-        threadClasses = new Thread[threads];
-
         //the length of the real axis which stretches across the screen
         zoom = 3.0;
         //what value on the complex plain is in the centre of the screen
         centre = new Vector(-0.5, 0);
 
+        init();
+    }
+
+    //set up lots of stuff
+    private void init(){
         bufferImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        //finishedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        //buffer = new int[width][height];
-        //buffer = new Colour[width][height];
         
         generationInProgress = false;
         needReGenerate = false;
+        
+        fractalThreads = new FractalThread[threads];
+        threadClasses = new Thread[threads];
+        
+        upscale=4;
     }
-
+    
     //load the standard mandelbrot
     public void loadMandelbrot(){
         functionOfZ = new Mandelbrot(30,true);
@@ -241,6 +267,7 @@ public class Fractal {
         window.repaint();
     }
     
+    //load a pretty Julia set
     public void loadJuliaQuadratic(){
         functionOfZ = new Julia(new Complex(-0.726895347709114071439, 0.188887129043845954792), Julia.ColourType.COSINE);
         centre = new Vector(0,0);
@@ -276,7 +303,9 @@ public class Fractal {
                 changeDetail(false);
                 break;
             case java.awt.event.KeyEvent.VK_PRINTSCREEN:
-                save();
+                if (allowSave) {
+                    save();
+                }
                 break;
         }
         window.repaint();
@@ -306,9 +335,9 @@ public class Fractal {
         aa = _aa;
     }
 
-    public void setOnlyAA(boolean _aa) {
-        onlyAA = _aa;
-    }
+//    public void setOnlyAA(boolean _aa) {
+//        onlyAA = _aa;
+//    }
 
     public void setUpscale(int _upscale) {
         upscale = _upscale;
@@ -318,67 +347,14 @@ public class Fractal {
         return !generationInProgress;
     }
     
-    public void setBackground(Colour bg){
-        background=bg;
-    }
-
-//    public Colour iterationToColour(int i) {
-//
-//        if (i == drawDetail || i == 0) {
-//            return background;
-//        }
-//        
-//        
-//
-//        //all these work:
-//        //Colour c = Colour.hsvToRgb((double) (i % 50) / 50.0, 0.5, 1.0);
-//        //Colour c = Colour.hsvToRgb((double) i/detail, 0.5, 1.0);
-//        //Colour c = Colour.hsvToRgb((double) (i-minI)/(maxI-minI), 0.5, 1.0);
-//
-//        //idea - look at iteration range and work it out so that it repeats x times across that range?
-//
-//        //double cycles = 1;
-//
-//        //double cycleSize = (double)(maxI-minI)/cycles;
-//        //double cycleSize = (double)(averageI-minI)/cycles;
-//        //double cycleSize = Math.log(maxI) * cycleMultiplier;
-//
-//        //double colour;// = (double) (i - minI) % cycleSize / cycleSize;
-//        Colour c;// = Colour.hsvToRgb(colour, 0.8, 1.0);
-//        
-//        switch(fractalType){
-//            case JULIA:
-//            {
-//                //get from 0->max value back to 0->1
-//                
-//                double colour = (double)i/(double)Integer.MAX_VALUE;
-//                
-//                //c = new Colour((int)Math.round(255.0*colour), (int)Math.round(255.0*colour), 0);
-//                c = Colour.hsvToRgb(colour, 0.75, 1.0);
-//                
-//                
-//                
-//                break;
-//            }
-//            case MANDELBROT:
-//            default:
-//            {
-//                double cycleSize = Math.log(drawDetail) * cycleMultiplier;
-//
-//                double colour = (double) i % cycleSize / cycleSize;// - minI)
-//                c = Colour.hsvToRgb(colour, 0.8, 1.0);
-//            }
-//                break;
-//        }
-//        
-//        //Colour c = Colour.hsvToRgb((double) (i-minI)/averageI, 0.5, 1.0);
-//        //Colour c = Colour.hsvToRgb((double)i%255/255, 0.5, 1.0);
-//        //Colour c = Colour.hsvToRgb((double) (i-minI)%averageI/averageI, 0.5, 1.0);
-//        //subtract something other than minI to change the colour start?
-//        
-//        return c;
+//    public void setBackground(Colour bg){
+//        background=bg;
 //    }
 
+    public void setProgressMonitor(ProgressMonitor pm){
+        progressMonitor=pm;
+    }
+    
     //taking ints where they are either -1,0 or 1, so the current zoom level is taken into account
     public void move(int x, int y) {
         centre = centre.add(new Vector(x, y), (zoom * 0.1));
@@ -388,10 +364,7 @@ public class Fractal {
     public void changeDetail(boolean more) {
         
         double m=5;
-        //scale less if drawing a julia
-        if(fractalType==FractalType.JULIA){
-            m=2;
-        }
+
         if (more) {
             detail *= m;
         } else {
@@ -455,18 +428,6 @@ public class Fractal {
         return offset;
     }
 
-    //set max/min and add up totals
-//    private synchronized void setIStuff(int i) {
-//        if (i < minI) {
-//            minI = i;
-//        }
-//
-//        if (i > maxI) {
-//            maxI = i;
-//        }
-//
-//        totalIs += i;
-//    }
 
     public void generateStrip(int x1, int x2) {
         Vector offset = offset(drawCentre, drawZoom);
@@ -474,19 +435,14 @@ public class Fractal {
         for (int x = x1; x < x2; x++) {
             for (int y = 0; y < height; y++) {
                 Vector p = new Vector(x, height - y - 1);
-
                 //get p to be relative to offset in the complex plain
                 p = p.multiply(adjustedZoom);
-
                 //offset is the top left on the viewport on the complex plain
                 p = p.add(offset);
-
+                
                 Complex c = new Complex(p.x, p.y);
-
                 Complex z = new Complex(0, 0);
-
                 Color colour = functionOfZ.iterations(z, c, drawDetail);
-
                 bufferImage.setRGB(x, height - y - 1, colour.getRGB());
             }
         }
@@ -523,8 +479,6 @@ public class Fractal {
 
     public synchronized void threadFinished(int id) {
         if (threadsDrawnTo < width) {
-            //fractalThreads[id]=new FractalThread(this,threadsDrawnTo, threadsDrawnTo+1, id);
-
             fractalThreads[id].newXs(threadsDrawnTo, threadsDrawnTo + 1);
             threadClasses[id] = new Thread(fractalThreads[id]);
             threadClasses[id].start();
@@ -536,9 +490,6 @@ public class Fractal {
         if(window!=null){
             //saving a fractal doesn't necessarily mean it had a window - the big version to be AA for example
             window.repaint();
-//            if(isSaving){
-//                window.saving(threadsDrawnTo);
-//            }
         }
         
         if (finishedThreads >= threads) {
@@ -547,9 +498,10 @@ public class Fractal {
                 window.repaint();
             }
             generationInProgress = false;
-            isSaving=false;
+            
             if (saveWhenFinished) {
-                save(saveAs, false);
+                //if saving when we've finished, we don't need the info string - it's either for an animation or an AA image
+                save(saveAs,aa,false);
             }
 
             if (needReGenerate) {
@@ -558,46 +510,42 @@ public class Fractal {
         }
     }
 
+    //old-style save, saves useful stuff: imagebuffer, info and AA version
     public void save() {
-        save((int) (System.currentTimeMillis() / 1000L) + "", true);
+        
+        String filename = "images/"+(int) (System.currentTimeMillis() / 1000L);
+        save(filename,false,true);
+        //the larger image
+        //saveBig(filename,upscale,false);
+        //the larger image AA
+        saveBig(filename+"_aa",upscale,true);
     }
 
-    public void save(String filename, boolean bigToo) {
-        if (allowSave) {
-//            if(window!=null){
-//                window.saving(0);
-//            }
-            //isSaving=true;
+    public void saveBig(String filename){
+        saveBig(filename,upscale,true);
+    }
+    
+    public void saveBig(String filename, int scale, boolean _aa){
+        //this should be auto-saved
+        Fractal f = new Fractal(width*scale, height*scale, threads, functionOfZ, detail, zoom, centre, filename, _aa);
+        f.setProgressMonitor(progressMonitor);
+    }
+    
+    public void save(String filename, boolean aa,boolean info) {
             try {
-                if (bigToo) {
-                    //BufferedImage bigImage = new BufferedImage(width*upscale,height*upscale,BufferedImage.TYPE_INT_RGB);
-                    Fractal bigFractal = new Fractal(width * upscale, height * upscale, allowSave, threads,functionOfZ);
-                    
-                    //bigFractal.setWindow(window);
-                    
-                    bigFractal.loadSettings(centre, zoom, detail);
-                    bigFractal.saveWhenFinished(filename + "_big");
-                    bigFractal.setUpscale(upscale);
-                    bigFractal.setBackground(background);
-                    
-                    bigFractal.generate();
-                }
-                
-                if (!onlyAA) {
-                    //don't write this small one if we're after the AA version
-                    ImageIO.write(bufferImage, "png", new File("images/" + filename + ".png"));
+
+                if(aa){
+                    //rescaled image
+                    BufferedImage aaImage = Image.getScaledInstance(bufferImage, width / upscale, height / upscale, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);
+                    ImageIO.write(aaImage, "png", new File( filename + ".png"));
+                }else{
+                    //just the straight buffer
+                    ImageIO.write(bufferImage, "png", new File(filename + ".png"));
                 }
 
-                if (!bigToo) {
-                    //this is the big image
-                    if (aa) {
-                        BufferedImage aaImage = Image.getScaledInstance(bufferImage, width / upscale, height / upscale, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);
-
-                        ImageIO.write(aaImage, "png", new File("images/" + filename + "_aa.png"));
-                    }
-                } else {
-                    //this is NOT the big image
-                    FileWriter fstream = new FileWriter("images/" + filename + ".txt");
+                if(info) {
+                    //store a text file too
+                    FileWriter fstream = new FileWriter(filename + ".txt");
                     BufferedWriter out = new BufferedWriter(fstream);
                     out.write(infoString(true));
                     //Close the output stream
@@ -607,7 +555,6 @@ public class Fractal {
             } catch (IOException ex) {
                 Logger.getLogger(Fractal.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
     }
 
     public String statusText(){
