@@ -66,16 +66,11 @@ public class Fractal {
     private double zoomAdjust = 0.8;
     //how much bigger to make hte big image when saving
     private int upscale;
-    private boolean allowSave, generationInProgress, needReGenerate;//,changingImage;
-    private boolean saveWhenFinished, aa;//, onlyAA;
+    private boolean allowSave, generationInProgress, needReGenerate, cancelGeneration;
+    private boolean saveWhenFinished, aa;
     private String saveAs;
     private FractalThread[] fractalThreads;
     private Thread[] threadClasses;
-    //changes how often the colours repeat
-    //private double cycleMultiplier;
-    private Colour background;
-    
-    private boolean isSaving;
     
     private FunctionOfZ functionOfZ;
     
@@ -265,6 +260,8 @@ public class Fractal {
         threadClasses = new Thread[threads];
         
         upscale=4;
+        
+        cancelGeneration=false;
     }
     
     //load the standard mandelbrot
@@ -488,12 +485,44 @@ public class Fractal {
             }
         } else {
             needReGenerate = true;
+            cancelGeneration = true;
         }
 
     }
 
-    public synchronized void threadFinished(int id) {
-        if (threadsDrawnTo < width) {
+    public synchronized void threadFinished(int id, FractalThread t) {
+        //this is so any threads that were killed off by a cancelation can't then spread artifacts around
+        if(t.stopped()){
+            return;
+        }
+        
+        if(progressMonitor!=null && progressMonitor.isCanceled()){
+            cancelGeneration=true;
+        }
+        
+        if(cancelGeneration){
+            //need to stop generating this fractal
+            
+            //count how many other threads are left
+            //int threadsStillGoing=0;
+            for(int i=0;i<threads;i++){
+//                if(threadClasses[i].isAlive()){
+//                    //threadsStillGoing++;
+//                }
+                fractalThreads[i].stop();
+            }
+            //System.out.println(threadsStillGoing);
+            //if none, we've successfully canceled
+            //if(threadsStillGoing==1){
+                cancelGeneration=false;
+                generationInProgress = false;
+                if (needReGenerate) {
+                        generate();
+                    }
+              //  }
+                    
+        }else if (threadsDrawnTo < width) {
+            //continue generation
             int drawTo =threadsDrawnTo + 2;
                 if(drawTo >width){
                     drawTo=width;
@@ -539,7 +568,7 @@ public class Fractal {
          return "images/"+(int) (System.currentTimeMillis() / 1000L);
     }
     
-    //old-style save, saves useful stuff: imagebuffer, info and AA version
+    //saves buffer and info
     public void save() {
         String filename = getFileName();
         
@@ -547,18 +576,24 @@ public class Fractal {
         //the larger image
         //saveBig(filename,upscale,false);
         //the larger image AA
-        saveBig(filename+"_aa",upscale,true,null);
+        //saveBig(filename+"_aa",upscale,true,null);
     }
 
     public void saveBig(String filename){
         saveBig(filename,upscale,true,null);
     }
     
+    //this assumes we're just AA the image at the same rez
     public void saveBig(String filename, int scale, boolean _aa, ProgressMonitor pm){
+        saveBig(filename, scale, scale, _aa, pm);
+    }
+    
+    //can also make the image bigger as well as AA it!
+    public void saveBig(String filename, int scaleUp, int scaleDown, boolean _aa, ProgressMonitor pm){
         //this should be auto-saved
-        Fractal f = new Fractal(width*scale, height*scale, threads, functionOfZ, detail, zoom, centre, filename, _aa,pm);
+        Fractal f = new Fractal(width*scaleUp, height*scaleUp, threads, functionOfZ, detail, zoom, centre, filename, _aa,pm);
         //f.setProgressMonitor(progressMonitor);
-        f.setUpscale(scale);
+        f.setUpscale(scaleDown);
     }
     
     public void save(String filename, boolean aa,boolean info) {
@@ -571,7 +606,9 @@ public class Fractal {
                     //rescaled image
                     BufferedImage aaImage = Image.getScaledInstance(bufferImage, width / upscale, height / upscale, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);
                     ImageIO.write(aaImage, "png", new File( filename + ".png"));
-                    progressMonitor.setProgress(width+1);
+                    if(progressMonitor!=null){
+                        progressMonitor.setProgress(width+1);
+                    }
                 }else{
                     //just the straight buffer
                     ImageIO.write(bufferImage, "png", new File(filename + ".png"));
@@ -618,12 +655,14 @@ class FractalThread implements Runnable {
 
     private int x1, x2, id;
     private Fractal f;
+    private boolean stop;
 
     public FractalThread(Fractal _f, int _x1, int _x2, int _id) {
         f = _f;
         x1 = _x1;
         x2 = _x2;
         id = _id;
+        stop=false;
     }
 
     public void newXs(int _x1, int _x2) {
@@ -631,9 +670,20 @@ class FractalThread implements Runnable {
         x2 = _x2;
     }
 
+    public void stop(){
+        stop=true;
+    }
+    
+    public boolean stopped(){
+        return stop;
+    }
+    
     @Override
     public void run() {
         f.generateStrip(x1, x2);
-        f.threadFinished(id);
+        //not bothering to stop it mid-strip, but can stop it interfeering with anything else
+        if(!stop){
+            f.threadFinished(id,this);
+        }
     }
 }

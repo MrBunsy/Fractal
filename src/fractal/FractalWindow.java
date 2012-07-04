@@ -51,16 +51,18 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
     private JLabel statusLabel;
     //private Dimension oldDims;
     
-    private int width;
+    private int width,height;
     
     private ProgressMonitor progMon;
     
     private final JFrame thisPanel = this;
     
-    public FractalWindow(Fractal _fractal, int width, int height){
-        panel = new FractalPanel(_fractal, width, height);
+    public FractalWindow(Fractal _fractal, int _width, int _height){
+        panel = new FractalPanel(_fractal, _width, _height);
         fractal=_fractal;
         
+        width=_width;
+        height=_height;
         
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         
@@ -247,7 +249,7 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
         
         // ------------------- Export Menu -------------------
         
-        JMenuItem standardExport = new JMenuItem("Standard");
+        JMenuItem standardExport = new JMenuItem("Info + Preview");
         exportMenu.add(standardExport);
         standardExport.addActionListener(new ActionListener() {
             @Override
@@ -256,7 +258,7 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
             }
         });
         
-        JMenuItem aa4Export = new JMenuItem("4xAA");
+        JMenuItem aa4Export = new JMenuItem("4xAA - "+(width)+"x"+(height));
         exportMenu.add(aa4Export);
         aa4Export.addActionListener(new ActionListener() {
             @Override
@@ -269,7 +271,7 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
             }
         });
         
-        JMenuItem aa8Export = new JMenuItem("8xAA");
+        JMenuItem aa8Export = new JMenuItem("8xAA - "+(width)+"x"+(height));
         exportMenu.add(aa8Export);
         aa8Export.addActionListener(new ActionListener() {
             @Override
@@ -279,6 +281,32 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
                 progressMonitor = new ProgressMonitor(thisPanel, "Exporting to "+filename+".png", null, 0, width+1);
                 progressMonitor.setMillisToDecideToPopup(0);
                 fractal.saveBig(filename, 8, true,progressMonitor);
+            }
+        });
+        
+        JMenuItem bigaa4Export = new JMenuItem("4xAA - "+(width*2)+"x"+(height*2));
+        exportMenu.add(bigaa4Export);
+        bigaa4Export.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+                String filename = fractal.getFileName()+"_4aa";
+                progressMonitor = new ProgressMonitor(thisPanel, "Exporting to "+filename+".png", null, 0, width+1);
+                progressMonitor.setMillisToDecideToPopup(0);
+                fractal.saveBig(filename, 8,4, true,progressMonitor);
+            }
+        });
+        
+        JMenuItem bigaa8Export = new JMenuItem("8xAA - "+(width*2)+"x"+(height*2));
+        exportMenu.add(bigaa8Export);
+        bigaa8Export.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+                String filename = fractal.getFileName()+"_8aa";
+                progressMonitor = new ProgressMonitor(thisPanel, "Exporting to "+filename+".png", null, 0, width+1);
+                progressMonitor.setMillisToDecideToPopup(0);
+                fractal.saveBig(filename, 16,8, true,progressMonitor);
             }
         });
         
