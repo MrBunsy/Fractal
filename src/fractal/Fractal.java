@@ -383,7 +383,8 @@ public class Fractal {
             Vector difference = new Vector(up.x - down.x, up.y - down.y);
 
             centre = centre.subtract(difference, zoom / (double) width);
-
+            
+            window.repaint();
             generate();
         }
     }
@@ -412,7 +413,7 @@ public class Fractal {
             updateZoom(scroll);
         }
         generate();
-
+        window.repaint();
     }
 
     private void updateZoom(int scroll) {
@@ -569,6 +570,10 @@ public class Fractal {
         }
     }
 
+    public String statusText(){
+        return infoString(false);
+    }
+    
     private String infoString(boolean detailed) {
         
         return "Centre: "+(detailed ? "(" + centre.x + "," + centre.y + ")" : centre)+", "+
@@ -584,7 +589,7 @@ public class Fractal {
 
         g.drawImage(bufferImage, 0, 0, null);
 
-        g.drawString(infoString(false), 5, 20);
+        //g.drawString(infoString(false), 5, height-10);
     }
 }
 

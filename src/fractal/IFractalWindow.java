@@ -29,4 +29,8 @@ import java.awt.Point;
 public interface IFractalWindow {
     public void repaint();
     public Point getMousePosition();
+    //how much has been generated?
+//    public void generating(double progress);
+//    public void finishedGenerating();
+    
 }

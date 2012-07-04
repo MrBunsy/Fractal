@@ -25,8 +25,9 @@
  */
 package fractal;
 
-import java.awt.Graphics;
-import java.awt.Point;
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
 
 /**
  *
@@ -36,6 +37,10 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
     
     private Fractal fractal;
     private FractalPanel panel;
+    private JMenuBar menuBar;
+    private JMenu fractalMenu,colourMenu,exportMenu;
+    private JLabel statusLabel;
+    private Dimension oldDims;
     
     public FractalWindow(Fractal _fractal, int width, int height){
         panel = new FractalPanel(_fractal, width, height);
@@ -46,11 +51,45 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
         
         setResizable(false);
         
-        //add(panel);
-        getContentPane().add(panel);
         
+        menuBar=new JMenuBar();
+        
+        fractalMenu = new JMenu("Fractal");
+        colourMenu = new JMenu("Colour");
+        exportMenu = new JMenu("Export");
+        
+        menuBar.add(fractalMenu);
+        menuBar.add(colourMenu);
+        menuBar.add(exportMenu);
+        
+        setJMenuBar(menuBar);
+        
+        //height+=menuBar.getHeight();
+        
+        add(panel);
+        //getContentPane().add(panel);
+        
+        
+        //http://stackoverflow.com/questions/3035880/how-can-i-create-a-bar-in-the-bottom-of-a-java-app-like-a-status-bar
+        // create the status bar panel and shove it down the bottom of the frame
+        JPanel statusPanel = new JPanel();
+        statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
+        add(statusPanel, BorderLayout.SOUTH);
+        statusPanel.setPreferredSize(new Dimension(width, 20));
+        statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
+        statusLabel = new JLabel("status");
+        statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        statusPanel.add(statusLabel);
+        
+        //to make up for the status bar at the bottom
+        height+=20;
+        //height+=getHeight();
+        
+        //content pane has prefered size
+        getContentPane().setPreferredSize(new java.awt.Dimension(width, height));
+        //so when pack is called, everything else fits around it :D
         pack();
-        setSize(new java.awt.Dimension(width, height));
+        //setSize(new java.awt.Dimension(width, height));
         setVisible(true);
         
         addKeyListener(new java.awt.event.KeyAdapter() {
@@ -58,10 +97,26 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
                 key(evt);
             }
         });
+        
     }
     
     private void key(java.awt.event.KeyEvent evt) {
         int key = evt.getKeyCode();
         fractal.key(key);
     }
+    
+    public void paint(Graphics g){
+        super.paint(g);
+        if(fractal.ready()){
+            statusLabel.setText(fractal.statusText());
+        }else{
+            statusLabel.setText("Generating...");
+        }
+    }
+    
+//    public void validate(){
+//        super.validate();
+//        
+//        //Dimension dims = getSize();
+//    }
 }

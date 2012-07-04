@@ -52,7 +52,6 @@ public class FractalPanel extends javax.swing.JPanel implements IFractalWindow {
         fractal.drag(mouseDown, mouseUp);
 
         mouseDown = null;
-
         //repaint();
     }
 
