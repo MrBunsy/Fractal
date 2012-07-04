@@ -26,13 +26,13 @@
 package fractal;
 
 import LukesBits.Vector;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
 
 /**
  *
@@ -327,6 +327,19 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
                 progressMonitor = new ProgressMonitor(thisPanel, "Exporting to "+filename+".png", null, 0, width+1);
                 progressMonitor.setMillisToDecideToPopup(0);
                 fractal.saveBig(filename, 16,8, true,progressMonitor);
+            }
+        });
+        
+        JMenuItem hugeExport = new JMenuItem((width*16)+"x"+(height*16));
+        exportMenu.add(hugeExport);
+        hugeExport.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+                String filename = fractal.getFileName()+"_8aa";
+                progressMonitor = new ProgressMonitor(thisPanel, "Exporting to "+filename+".png", null, 0, width+1);
+                progressMonitor.setMillisToDecideToPopup(0);
+                fractal.saveBig(filename, 16, false,progressMonitor);
             }
         });
         

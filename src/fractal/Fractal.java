@@ -49,6 +49,12 @@ import javax.swing.ProgressMonitor;
  * -done :D
  * 
  * TODO - cancel a generation and start again if something changes?
+ * DONE
+ * 
+ * TODO check that images folder exists and create if not
+ * 
+ * TODO put reset info in FunctionOfZ so each fractal can reset properly
+ * 
  */
 public class Fractal {
 
@@ -108,7 +114,7 @@ public class Fractal {
 
         int width = (Integer) parser.getOptionValue(widthArg, 600);
         int height = (Integer) parser.getOptionValue(heightArg, 600);
-        int threads = (Integer) parser.getOptionValue(threadsArg, 2);
+        int threads = (Integer) parser.getOptionValue(threadsArg, Runtime.getRuntime().availableProcessors());
         int upscale = (Integer) parser.getOptionValue(upScaleArg, 4);
         boolean animation = (Boolean) parser.getOptionValue(animationArg, false);
 
@@ -504,7 +510,8 @@ public class Fractal {
 
             if(progressMonitor!=null){
                 //extra one if we're using AA
-                progressMonitor.setMaximum(width + (aa ? 1 : 0));
+                //now an extra 2, because everything has an extra 1 for "saving image"
+                progressMonitor.setMaximum(width + (aa ? 2 : 1));
                 progressMonitor.setNote("Generating Image");
             }
             
@@ -603,6 +610,7 @@ public class Fractal {
 
     //get a default file name
     public String getFileName(){
+        new File("images/").mkdir();
          return "images/"+(int) (System.currentTimeMillis() / 1000L);
     }
     
@@ -643,13 +651,23 @@ public class Fractal {
                     }
                     //rescaled image
                     BufferedImage aaImage = Image.getScaledInstance(bufferImage, width / upscale, height / upscale, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);
+                    if(progressMonitor!=null){
+                        progressMonitor.setNote("Saving Image");
+                        progressMonitor.setProgress(width+1);
+                    }
                     ImageIO.write(aaImage, "png", new File( filename + ".png"));
+                    if(progressMonitor!=null){
+                        progressMonitor.setProgress(width+2);
+                    }
+                }else{
+                    if(progressMonitor!=null){
+                        progressMonitor.setNote("Saving Image");
+                    }
+                    //just the straight buffer
+                    ImageIO.write(bufferImage, "png", new File(filename + ".png"));
                     if(progressMonitor!=null){
                         progressMonitor.setProgress(width+1);
                     }
-                }else{
-                    //just the straight buffer
-                    ImageIO.write(bufferImage, "png", new File(filename + ".png"));
                 }
 
                 if(info) {
