@@ -10,7 +10,7 @@ import java.awt.Point;
  *
  * @author Luke
  */
-public class FractalPanel extends javax.swing.JPanel implements IFractalWindow {
+public class FractalPanel extends javax.swing.JPanel {
     
     private Fractal fractal;
     private Point mouseDown;

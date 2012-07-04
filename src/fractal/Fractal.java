@@ -42,6 +42,9 @@ import javax.imageio.ImageIO;
  * Funky fractal generator!
  *
  * @author Luke
+ * 
+ * 
+ * TODO - MASSIVELY tidy up the saving mechanism, so I can get feedback and it makes sense.
  */
 public class Fractal {
 
@@ -68,6 +71,8 @@ public class Fractal {
     //changes how often the colours repeat
     //private double cycleMultiplier;
     private Colour background;
+    
+    private boolean isSaving;
     
     private FunctionOfZ functionOfZ;
 
@@ -199,7 +204,7 @@ public class Fractal {
         //what actual f(z) is used
         functionOfZ=_functionOfZ;
 
-        
+        isSaving=false;
         
         aa = true;
         onlyAA = false;
@@ -528,8 +533,13 @@ public class Fractal {
             //finished!
             finishedThreads++;
         }
-        
-        window.repaint();
+        if(window!=null){
+            //saving a fractal doesn't necessarily mean it had a window - the big version to be AA for example
+            window.repaint();
+//            if(isSaving){
+//                window.saving(threadsDrawnTo);
+//            }
+        }
         
         if (finishedThreads >= threads) {
             //all of them finished!
@@ -537,7 +547,7 @@ public class Fractal {
                 window.repaint();
             }
             generationInProgress = false;
-
+            isSaving=false;
             if (saveWhenFinished) {
                 save(saveAs, false);
             }
@@ -554,11 +564,17 @@ public class Fractal {
 
     public void save(String filename, boolean bigToo) {
         if (allowSave) {
+//            if(window!=null){
+//                window.saving(0);
+//            }
+            //isSaving=true;
             try {
                 if (bigToo) {
                     //BufferedImage bigImage = new BufferedImage(width*upscale,height*upscale,BufferedImage.TYPE_INT_RGB);
                     Fractal bigFractal = new Fractal(width * upscale, height * upscale, allowSave, threads,functionOfZ);
-
+                    
+                    //bigFractal.setWindow(window);
+                    
                     bigFractal.loadSettings(centre, zoom, detail);
                     bigFractal.saveWhenFinished(filename + "_big");
                     bigFractal.setUpscale(upscale);

@@ -145,4 +145,8 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
         fractal.key(key);
         e.consume();
     }
+
+    @Override
+    public void saving(int x) {
+    }
 }

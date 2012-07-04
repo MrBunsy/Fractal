@@ -41,11 +41,18 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
     
     private Fractal fractal;
     private FractalPanel panel;
+    private JPanel progressPanel;
+    //private JDialog progDialog;
+    private JProgressBar progBar;
     //private JMenuBar menuBar;
     //private JMenu fractalMenu,colourMenu,exportMenu;
     //private JMenuItem fractalMenu_mandelbrot,fractalMenu_julia,fractalMenu_customMandelbrot,fractalMenu_customJulia;
     private JLabel statusLabel;
     //private Dimension oldDims;
+    
+    private int width;
+    
+    private ProgressMonitor progMon;
     
     public FractalWindow(Fractal _fractal, int width, int height){
         panel = new FractalPanel(_fractal, width, height);
@@ -65,20 +72,26 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
         //getContentPane().add(panel);
         
         
-        //http://stackoverflow.com/questions/3035880/how-can-i-create-a-bar-in-the-bottom-of-a-java-app-like-a-status-bar
-        // create the status bar panel and shove it down the bottom of the frame
-        JPanel statusPanel = new JPanel();
-        statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
-        add(statusPanel, BorderLayout.SOUTH);
-        statusPanel.setPreferredSize(new Dimension(width, 20));
-        statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
-        statusLabel = new JLabel("status");
-        statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
-        statusPanel.add(statusLabel);
-        
+//        //http://stackoverflow.com/questions/3035880/how-can-i-create-a-bar-in-the-bottom-of-a-java-app-like-a-status-bar
+//        // create the status bar panel and shove it down the bottom of the frame
+//        JPanel statusPanel = new JPanel();
+//        statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
+//        add(statusPanel, BorderLayout.SOUTH);
+//        statusPanel.setPreferredSize(new Dimension(width, 20));
+//        statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
+//        statusLabel = new JLabel("status");
+//        statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
+//        statusPanel.add(statusLabel);
+        addStatusPanel();
         //to make up for the status bar at the bottom
         height+=20;
         //height+=getHeight();
+        
+        //setupProgressPanel();
+        //setupProgressDialogue();
+        
+//        Dialog d = new Dialog(this);
+//        d.setVisible(true);
         
         //content pane has prefered size
         getContentPane().setPreferredSize(new java.awt.Dimension(width, height));
@@ -89,6 +102,8 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
         
         
 
+        //progMon.setProgress(2);
+        
         addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 key(evt);
@@ -97,13 +112,74 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
         
     }
     
+//    private void setupProgressDialogue(){
+//        progDialog = new JDialog(this);
+//        progBar = new javax.swing.JProgressBar();
+//        progDialog.add(progBar);
+//        progDialog.setVisible(true);
+//    }
+    
+//    private void setupProgressPanel(){
+////        progressPanel = new JPanel();
+////        progressBar = new javax.swing.JProgressBar();
+////        progressPanel.add(progressBar,BorderLayout.CENTER);
+////        
+////        add(progressPanel,BorderLayout.CENTER);
+////        
+////        progressPanel.setPreferredSize(new Dimension(200,50));
+////        progressPanel.setLayout(new BoxLayout(progressPanel, BoxLayout.Y_AXIS));
+////        progressPanel.setVisible(true);
+////        progressPanel = new JPanel();
+////        progressPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
+////        //add(progressPanel, BorderLayout.SOUTH);
+////        
+////        getLayeredPane().add(progressPanel,new Integer(300));
+////        
+////        progressPanel.setPreferredSize(new Dimension(200, 500));
+////        //progressPanel.setLayout(new BoxLayout(progressPanel, BoxLayout.Y_AXIS));
+////        progBar = new javax.swing.JProgressBar();
+////        progBar.setPreferredSize(new Dimension(200,20));
+////        statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
+////        progressPanel.add(progBar);
+////        
+////        progressPanel.setVisible(true);
+//        
+//        
+//        progBar = new javax.swing.JProgressBar();
+//        
+//        progBar.setBounds(getWidth()/3, getHeight()/3, 2*getWidth()/3, 2*getHeight()/3);
+//        
+//        getLayeredPane().add(progBar,new Integer(300));
+//        
+//    }
+    
+    private void addStatusPanel(){
+        //http://stackoverflow.com/questions/3035880/how-can-i-create-a-bar-in-the-bottom-of-a-java-app-like-a-status-bar
+        // create the status bar panel and shove it down the bottom of the frame
+        JPanel statusPanel = new JPanel();
+        statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
+        
+        //getLayeredPane().add(statusPanel,new Integer(300));
+        
+        add(statusPanel, BorderLayout.SOUTH);
+        
+        
+        statusPanel.setPreferredSize(new Dimension(getWidth(), 20));
+        statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
+        statusLabel = new JLabel("status");
+        statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        statusPanel.add(statusLabel);
+    }
+    
     private void setupMenus(){
         JMenuBar menuBar=new JMenuBar();
         
         JMenu fractalMenu = new JMenu("Fractal");
-        JMenu colourMenu = new JMenu("Colour");
+        JMenu colourMenu = new JMenu("Colours");
         JMenu exportMenu = new JMenu("Export");
+        JMenu controlMenu = new JMenu("Controls");
         
+        // ------------------- Fractal Menu -------------------
         //option to load hte default mandelbrot
         JMenuItem loadMandelbrot = new JMenuItem("Mandelbrot");
         fractalMenu.add(loadMandelbrot);
@@ -123,11 +199,63 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
             }
         });
         
+        // ------------------- Colour Menu -------------------
         
+        
+        // ------------------- Control Menu -------------------
+        
+        JMenuItem zoomIn = new JMenuItem("Zoom In");
+        controlMenu.add(zoomIn);
+        zoomIn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fractal.scroll(-1);
+            }
+        });
+        
+        JMenuItem zoomOut = new JMenuItem("Zoom Out");
+        controlMenu.add(zoomOut);
+        zoomOut.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fractal.scroll(1);
+            }
+        });
+        
+        JMenuItem moreDetail = new JMenuItem("Increase Detail");
+        controlMenu.add(moreDetail);
+        moreDetail.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fractal.changeDetail(true);
+            }
+        });
+        
+        JMenuItem lessDetail = new JMenuItem("Decrease Detail");
+        controlMenu.add(lessDetail);
+        lessDetail.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fractal.changeDetail(false);
+            }
+        });
+        
+        // ------------------- Export Menu -------------------
+        
+        JMenuItem standardExport = new JMenuItem("Default PNG");
+        exportMenu.add(standardExport);
+        standardExport.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fractal.save();
+            }
+        });
         
         menuBar.add(fractalMenu);
         menuBar.add(colourMenu);
+        menuBar.add(controlMenu);
         menuBar.add(exportMenu);
+        
         
         setJMenuBar(menuBar);
     }
@@ -153,4 +281,13 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
 //        
 //        //Dimension dims = getSize();
 //    }
+
+    @Override
+    public void saving(int progress) {
+//        if(progress==0){
+//            progMon = new ProgressMonitor(this, "Saving...", "", 0, width);
+//        }
+//        progMon.setProgress(progress);
+//        System.out.println(progress);
+    }
 }

@@ -32,5 +32,5 @@ public interface IFractalWindow {
     //how much has been generated?
 //    public void generating(double progress);
 //    public void finishedGenerating();
-    
+    public void saving(int progress);
 }

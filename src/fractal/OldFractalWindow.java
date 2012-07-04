@@ -32,7 +32,7 @@ import java.awt.Point;
  *
  * @author Luke
  */
-public class OldFractalWindow extends javax.swing.JFrame implements IFractalWindow {
+public class OldFractalWindow extends javax.swing.JFrame {//implements IFractalWindow 
 
     private Fractal fractal;
     private Point mouseDown;
