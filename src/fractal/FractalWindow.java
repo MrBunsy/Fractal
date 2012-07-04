@@ -25,6 +25,7 @@
  */
 package fractal;
 
+import LukesBits.Vector;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -185,6 +186,7 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
         JMenu colourMenu = new JMenu("Colours");
         JMenu exportMenu = new JMenu("Export");
         JMenu controlMenu = new JMenu("Controls");
+        JMenu helpMenu = new JMenu("Help");
         
         // ------------------- Fractal Menu -------------------
         //option to load hte default mandelbrot
@@ -194,6 +196,15 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
             @Override
             public void actionPerformed(ActionEvent e) {
                 fractal.loadMandelbrot();
+            }
+        });
+        
+        JMenuItem loadShip = new JMenuItem("Burning Ship");
+        fractalMenu.add(loadShip);
+        loadShip.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fractal.loadBurningShip();
             }
         });
         
@@ -210,6 +221,15 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
         
         
         // ------------------- Control Menu -------------------
+        JMenuItem reset = new JMenuItem("Reset");
+        controlMenu.add(reset);
+        reset.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fractal.loadSettings(new Vector(0,0,0), 3, 50);
+            }
+        });
+        
         
         JMenuItem zoomIn = new JMenuItem("Zoom In");
         controlMenu.add(zoomIn);
@@ -310,10 +330,40 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
             }
         });
         
+        // ------------------- Help Menu -------------------
+        
+        
+        JMenuItem help = new JMenuItem("Help");
+        helpMenu.add(help);
+        help.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(thisPanel, 
+                        "Use the arrow keys or click and drag the cursor to move the viewport."+
+                        "\nThe mouse scroll wheel or Control Menu will zoom in and out."+
+                        "\n+/- keys or the Control menu can change the detail level.\n Higher detail levels take longer to render."
+                        , "Help - JavaFractal", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+        
+        JMenuItem about = new JMenuItem("About");
+        helpMenu.add(about);
+        about.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(thisPanel, 
+                        "JavaFractal is Copyright (c) Luke Wallin 2012"+
+                        "\nReleased under LPGL"+
+                        "\nwww.lukewallin.co.uk/graphics/fractals"+
+                        "\nluke.wallin@gmail.com", "JavaFractal revision 27", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+        
         menuBar.add(fractalMenu);
         menuBar.add(colourMenu);
         menuBar.add(controlMenu);
         menuBar.add(exportMenu);
+        menuBar.add(helpMenu);
         
         
         setJMenuBar(menuBar);

@@ -132,7 +132,7 @@ public class Fractal {
                 FunctionOfZ fz = new Mandelbrot(30,true);
                 
                 //Fractal f = new Fractal(width * upscale, height * upscale, true, threads, FractalType.JULIA,fz);
-                Fractal f = new Fractal(width * upscale, height * upscale, true, threads, fz);
+                Fractal f = new Fractal(width * upscale, height * upscale, true, threads);//, fz
                 f.loadSettings(c, z, 1000);
                 //f.setUpscale(upscale);
                 f.saveWhenFinished("/" + folderName + "/" + i);
@@ -178,7 +178,8 @@ public class Fractal {
             //FunctionOfZ fz = new BurningShip(30,true);
 
             //Fractal f = new Fractal(width * upscale, height * upscale, true, threads, FractalType.JULIA,fz);
-            Fractal f = new Fractal(width, height, true, threads, fz);
+            //Fractal f = new Fractal(width, height, true, threads, fz);
+            Fractal f = new Fractal(width, height, true, threads);
             //f.setJulia(new Complex(0.36237,0.32), 10);
             
             //f.setCycleMultiplier(50);
@@ -229,25 +230,45 @@ public class Fractal {
         init();
     }
     
-    //TODO, cull this later?
-    public Fractal(int _width, int _height, boolean _allowSave, int _threads, FunctionOfZ _functionOfZ) {
+    public Fractal(int _width, int _height, boolean _allowSave, int _threads){
         width = _width;
         height = _height;
         allowSave = _allowSave;
-        //upscale = 4;
-        detail = 50;
-        functionOfZ=_functionOfZ;
-
-        aa = true;
         threads = _threads;
         
-        //the length of the real axis which stretches across the screen
-        zoom = 3.0;
-        //what value on the complex plain is in the centre of the screen
-        centre = new Vector(-0.5, 0);
-
+//        aa=true;
+//        
+//        detail=50;
+//        //just load a default fractal
+//        functionOfZ = new Mandelbrot(30,true);
+//        centre = new Vector(-0.5, 0);
+//        zoom = 3.0;
+        
         init();
+        loadMandelbrot();
+        
+        
     }
+    
+    //TODO, cull this later?
+//    public Fractal(int _width, int _height, boolean _allowSave, int _threads, FunctionOfZ _functionOfZ) {
+//        width = _width;
+//        height = _height;
+//        allowSave = _allowSave;
+//        //upscale = 4;
+//        detail = 50;
+//        functionOfZ=_functionOfZ;
+//
+//        aa = true;
+//        threads = _threads;
+//        
+//        //the length of the real axis which stretches across the screen
+//        zoom = 3.0;
+//        //what value on the complex plain is in the centre of the screen
+//        centre = new Vector(-0.5, 0);
+//
+//        init();
+//    }
 
     //set up lots of stuff
     private void init(){
@@ -269,8 +290,22 @@ public class Fractal {
         functionOfZ = new Mandelbrot(30,true);
         centre = new Vector(-0.5, 0);
         zoom = 3.0;
+        detail=50;
         generate();
-        window.repaint();
+        if(window!=null){
+            window.repaint();
+        }
+    }
+    
+    public void loadBurningShip(){
+        functionOfZ = new BurningShip(30,true);
+        centre = new Vector(-0.4, -0.5);
+        zoom = 3.5;
+        detail=50;
+        generate();
+        if(window!=null){
+            window.repaint();
+        }
     }
     
     //load a pretty Julia set
@@ -280,7 +315,9 @@ public class Fractal {
         zoom = 3d;
         detail=1000;
         generate();
-        window.repaint();
+         if(window!=null){
+            window.repaint();
+        }
     }
     
     public void key(int key) {
@@ -335,6 +372,7 @@ public class Fractal {
         centre = _centre;
         zoom = _zoom;
         detail = _detail;
+        generate();
     }
 
     public void setAA(boolean _aa) {

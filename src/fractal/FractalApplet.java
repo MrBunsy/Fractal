@@ -19,6 +19,7 @@
 package fractal;
 
 import LukesBits.Complex;
+import LukesBits.Vector;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -37,6 +38,10 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
     private Point mouseDown;
     private FractalPanel panel;
     private JLabel statusLabel;
+    private int width,height;
+    
+    private final JApplet thisPanel = this;
+    
     /**
      * Initialization method that will be called after the applet is loaded into
      * the browser.
@@ -47,11 +52,12 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
         
 //        
         //FunctionOfZ fz = new Mandelbrot(30,false);
-        FunctionOfZ fz = new Julia(new Complex(0,1), Julia.ColourType.COSINE);
-        fractal = new Fractal(d.width, d.height,false,2,fz);
+        //FunctionOfZ fz = new Julia(new Complex(0,1), Julia.ColourType.COSINE);
+        fractal = new Fractal(d.width, d.height,false,2);//,fz
         fractal.setWindow(this);
         
-       
+       width=d.width;
+       height=d.height;
         
         panel = new FractalPanel(fractal, d.width-10, d.height-10);
         
@@ -81,12 +87,17 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
     }
     
     private void setupMenus(){
+        
+        
         JMenuBar menuBar=new JMenuBar();
         
         JMenu fractalMenu = new JMenu("Fractal");
-        JMenu colourMenu = new JMenu("Colour");
-        JMenu exportMenu = new JMenu("Export");
+        JMenu colourMenu = new JMenu("Colours");
+        //JMenu exportMenu = new JMenu("Export");
+        JMenu controlMenu = new JMenu("Controls");
+        JMenu helpMenu = new JMenu("Help");
         
+        // ------------------- Fractal Menu -------------------
         //option to load hte default mandelbrot
         JMenuItem loadMandelbrot = new JMenuItem("Mandelbrot");
         fractalMenu.add(loadMandelbrot);
@@ -94,6 +105,15 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
             @Override
             public void actionPerformed(ActionEvent e) {
                 fractal.loadMandelbrot();
+            }
+        });
+        
+        JMenuItem loadShip = new JMenuItem("Burning Ship");
+        fractalMenu.add(loadShip);
+        loadShip.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fractal.loadBurningShip();
             }
         });
         
@@ -106,11 +126,93 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
             }
         });
         
+        // ------------------- Colour Menu -------------------
         
+        
+        // ------------------- Control Menu -------------------
+        JMenuItem reset = new JMenuItem("Reset");
+        controlMenu.add(reset);
+        reset.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fractal.loadSettings(new Vector(0,0,0), 3, 50);
+            }
+        });
+        
+        
+        JMenuItem zoomIn = new JMenuItem("Zoom In");
+        controlMenu.add(zoomIn);
+        zoomIn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fractal.scroll(-1);
+            }
+        });
+        
+        JMenuItem zoomOut = new JMenuItem("Zoom Out");
+        controlMenu.add(zoomOut);
+        zoomOut.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fractal.scroll(1);
+            }
+        });
+        
+        JMenuItem moreDetail = new JMenuItem("Increase Detail");
+        controlMenu.add(moreDetail);
+        moreDetail.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fractal.changeDetail(true);
+            }
+        });
+        
+        JMenuItem lessDetail = new JMenuItem("Decrease Detail");
+        controlMenu.add(lessDetail);
+        lessDetail.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fractal.changeDetail(false);
+            }
+        });
+        
+        
+        
+        // ------------------- Help Menu -------------------
+        
+        
+        JMenuItem help = new JMenuItem("Help");
+        helpMenu.add(help);
+        help.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(thisPanel, 
+                        "Use the arrow keys or click and drag the cursor to move the viewport."+
+                        "\nThe mouse scroll wheel or Control Menu will zoom in and out."+
+                        "\n+/- keys or the Control menu can change the detail level.\n Higher detail levels take longer to render."
+                        , "Help - JavaFractal", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+        
+        JMenuItem about = new JMenuItem("About");
+        helpMenu.add(about);
+        about.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(thisPanel, 
+                        "JavaFractal is Copyright (c) Luke Wallin 2012"+
+                        "\nReleased under LPGL"+
+                        "\nwww.lukewallin.co.uk/graphics/fractals"+
+                        "\nluke.wallin@gmail.com", "JavaFractal revision 27", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
         
         menuBar.add(fractalMenu);
         menuBar.add(colourMenu);
-        menuBar.add(exportMenu);
+        menuBar.add(controlMenu);
+        //menuBar.add(exportMenu);
+        menuBar.add(helpMenu);
+        
         
         setJMenuBar(menuBar);
     }
