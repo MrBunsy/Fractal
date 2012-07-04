@@ -81,6 +81,9 @@ public class Julia implements FunctionOfZ{
                 }else{
                     //non escaped
                     return Colour.blue.dim(1.0-angle/Math.PI).toColor();
+                    
+                    //return Colour.blue.toColor();
+                    
                     //return Color.getHSBColor((float)(angle/Math.PI), 0.8f, 1.0f);
                 }
                 

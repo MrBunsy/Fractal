@@ -1,0 +1,2 @@
+Smooth colouring of mandelbrot:
+http://www.hiddendimension.com/FractalMath/Divergent_Fractals_Main.html

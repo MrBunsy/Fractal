@@ -148,13 +148,15 @@ public class Fractal {
                 }
             }
         } else {
-            //Complex mu = new Complex(0.36237,0.32);
+            Complex mu = new Complex(0.36237,0.32);
             //Complex mu = new Complex(0.285,0.01);
             //Complex mu = new Complex(0.8,0.156);
             //Complex mu = new Complex(-0.726895347709114071439, 0.188887129043845954792);//very pretty - top of wiki page
-            Complex mu = new Complex(-0.8,0.156);
+            //Complex mu = new Complex(-0.8,0.156);
             //Complex mu = new Complex(-0.74543,0.11301);
             //Complex mu = new Complex(-0.4,0.6);
+            //Complex mu = new Complex(0,1);//lightning!
+            
 //            Random random = new Random(9323222);
 //            
 //            Complex mu;
@@ -447,65 +449,20 @@ public class Fractal {
         double adjustedZoom = drawZoom / (double) width;
         for (int x = x1; x < x2; x++) {
             for (int y = 0; y < height; y++) {
-                Color colour;
-
                 Vector p = new Vector(x, height - y - 1);
 
                 //get p to be relative to offset in the complex plain
                 p = p.multiply(adjustedZoom);
 
                 //offset is the top left on the viewport on the complex plain
-                //Vector offset = offset();
                 p = p.add(offset);
-                //p=p.subtract(new Vector(zoom/2.0,zoom/2.0));//origin.add(
-
 
                 Complex c = new Complex(p.x, p.y);
 
                 Complex z = new Complex(0, 0);
 
-                //int i = 0;
+                Color colour = functionOfZ.iterations(z, c, drawDetail);
 
-
-//                switch (fractalType) {
-//                    case MANDELBROT:
-//                        while (z.magnitudeSqrd() < 4 && i < drawDetail) {
-//                            z = z.times(z).plus(c);
-//                            i++;
-//                        }
-                        colour = functionOfZ.iterations(z, c, drawDetail);
-//                        break;
-////                    case BURNINGSHIP:
-////                        while (z.magnitudeSqrd() < 4 && i < drawDetail) {
-////                            Complex q = new Complex(Math.abs(z.re()), Math.abs(z.im()));
-////                            z = q.times(q).plus(c);
-////                            i++;
-////                        }
-////                        break;
-//                    case JULIA:
-//                    default:
-////                        while (c.magnitudeSqrd() < 4 && i < drawDetail) {
-////                            c = c.times(c).plus(juliaMu);
-////                            i++;
-////                        }
-//                        colour = functionOfZ.iterations(z, c, drawDetail);
-//                        
-////                        if(c.magnitudeSqrd() < 4){
-////                            
-////                        }else{
-////                            i=0;
-////                        }
-////                        if(c.magnitudeSqrd() >= 4){
-////                            //outside julia set
-////                            i=0;
-////                        }
-//                        break;
-//
-//                }
-
-                //setIStuff(i);
-
-                //buffer[x][height - y - 1] = colour;
                 bufferImage.setRGB(x, height - y - 1, colour.getRGB());
             }
         }
@@ -516,15 +473,9 @@ public class Fractal {
         if (!generationInProgress) {
             generationInProgress = true;
             needReGenerate = false;
-//            minI = detail;
-//            maxI = 0;
-
             drawDetail = detail;
             drawCentre = centre.copy();
             drawZoom = zoom;
-
-            //totalIs = 0;
-
             finishedThreads = 0;
 
             //what xcoord has been drawn up to
@@ -532,10 +483,8 @@ public class Fractal {
 
             for (int t = 0; t < threads; t++) {
                 fractalThreads[t] = new FractalThread(this, threadsDrawnTo, threadsDrawnTo + 1, t);
-
                 threadClasses[t] = new Thread(fractalThreads[t]);
                 threadClasses[t].start();
-
                 threadsDrawnTo++;
             }
         } else {
@@ -549,11 +498,8 @@ public class Fractal {
             //fractalThreads[id]=new FractalThread(this,threadsDrawnTo, threadsDrawnTo+1, id);
 
             fractalThreads[id].newXs(threadsDrawnTo, threadsDrawnTo + 1);
-
             threadClasses[id] = new Thread(fractalThreads[id]);
-
             threadClasses[id].start();
-
             threadsDrawnTo++;
         } else {
             //finished!
@@ -562,8 +508,6 @@ public class Fractal {
 
         if (finishedThreads >= threads) {
             //all of them finished!
-            //averageI = (double) totalIs / (double) (width * height);
-            //bufferToImage();
             if (window != null) {
                 window.repaint();
             }
@@ -578,18 +522,6 @@ public class Fractal {
             }
         }
     }
-
-    //take the iteration values in the buffer and create the image;
-//    private synchronized void bufferToImage() {
-//        //changingImage=true;
-//        for (int x = 0; x < width; x++) {
-//            for (int y = 0; y < height; y++) {
-//                //bufferImage.setRGB(x, y, iterationToColour(buffer[x][y]).toColor().getRGB());
-//                bufferImage.setRGB(x, y, buffer[x][y].toColor().getRGB());
-//            }
-//        }
-//        //changingImage=false;
-//    }
 
     public void save() {
         save((int) (System.currentTimeMillis() / 1000L) + "", true);
@@ -609,22 +541,7 @@ public class Fractal {
                     
                     bigFractal.generate();
                 }
-
-                //wait till ready
-//                while(!bigFractal.ready()){
-//                    try {
-//                        Thread.sleep(100);
-//                    } catch (InterruptedException ex) {
-//                        Logger.getLogger(Fractal.class.getName()).log(Level.SEVERE, null, ex);
-//                    }
-//                }
-
-
-//                Graphics bigGraphics = bigImage.getGraphics();
-//                
-//                bigFractal.draw(bigGraphics);
-
-                //String filename = (int) (System.currentTimeMillis() / 1000L)+"";
+                
                 if (!onlyAA) {
                     //don't write this small one if we're after the AA version
                     ImageIO.write(bufferImage, "png", new File("images/" + filename + ".png"));
@@ -632,8 +549,6 @@ public class Fractal {
 
                 if (!bigToo) {
                     //this is the big image
-                    //BufferedImage aaImage = new BufferedImage(width/upscale,height/upscale,BufferedImage.TYPE_INT_RGB);
-                    //aaImage = Image.getScaledInstance(bufferImage, width, height, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);
                     if (aa) {
                         BufferedImage aaImage = Image.getScaledInstance(bufferImage, width / upscale, height / upscale, RenderingHints.VALUE_INTERPOLATION_BICUBIC, true);
 
@@ -647,14 +562,7 @@ public class Fractal {
                     //Close the output stream
                     out.close();
                 }
-
-                //ImageIO.write(bigImage, "png", new File(filename+"_big.png"));
-
-                //            PrintWriter out = new PrintWriter(filename+".txt");
-                //            out.println(infoString());
-
-
-
+                
             } catch (IOException ex) {
                 Logger.getLogger(Fractal.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -676,7 +584,7 @@ public class Fractal {
 
         g.drawImage(bufferImage, 0, 0, null);
 
-        g.drawString(infoString(false), 10, 50);
+        g.drawString(infoString(false), 5, 20);
     }
 }
 
