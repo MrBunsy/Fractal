@@ -57,6 +57,8 @@ public class FractalPanel extends javax.swing.JPanel {
     private void mouseWheel(java.awt.event.MouseWheelEvent evt) {
         int scroll = evt.getWheelRotation();//.getPreciseWheelRotation();
         fractal.scroll(scroll);
+        //stop page from scrolling in applet
+        evt.consume();
         //repaint();
     }
 
