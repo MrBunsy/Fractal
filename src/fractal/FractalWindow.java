@@ -352,6 +352,15 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
             }
         });
         
+        JMenuItem resize1280_9 = new JMenuItem("1280x720 (16:9)");
+        windowMenu.add(resize1280_9);
+        resize1280_9.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                thisPanel.resizeWindow(1280, 72);
+            }
+        });
+        
         JMenuItem resize1280 = new JMenuItem("1280x800 (16:10)");
         windowMenu.add(resize1280);
         resize1280.addActionListener(new ActionListener() {
@@ -417,6 +426,19 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
             @Override
             public void actionPerformed(ActionEvent e) {
                 fractal.save();
+            }
+        });
+        
+        JMenuItem hugeExport = new JMenuItem((width*16)+"x"+(height*16));
+        exportMenu.add(hugeExport);
+        hugeExport.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+                String filename = fractal.getFileName()+"_huge";
+                progressMonitor = new ProgressMonitor(thisPanel, "Exporting to "+filename+".png", null, 0, width+1);
+                progressMonitor.setMillisToDecideToPopup(0);
+                fractal.saveBig(filename, 16, false,progressMonitor);
             }
         });
         
@@ -526,18 +548,7 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
             }
         });
         
-        JMenuItem hugeExport = new JMenuItem((width*16)+"x"+(height*16));
-        exportMenu.add(hugeExport);
-        hugeExport.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                
-                String filename = fractal.getFileName()+"_huge";
-                progressMonitor = new ProgressMonitor(thisPanel, "Exporting to "+filename+".png", null, 0, width+1);
-                progressMonitor.setMillisToDecideToPopup(0);
-                fractal.saveBig(filename, 16, false,progressMonitor);
-            }
-        });
+        
     }
     
     public void paint(Graphics g){
