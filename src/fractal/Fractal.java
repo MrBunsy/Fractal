@@ -63,6 +63,9 @@ import javax.swing.ProgressMonitor;
  * 
  * 
  * idea - make the colour dialogue part of functionOfZ, that way the different options for julia and mandelbrot stuff can be dealt with?
+ * -didn't do this in the end, would've been messy
+ * 
+ * todo: tidy up status bar at bottom with more useful info
  *
  */
 public class Fractal {
@@ -304,6 +307,11 @@ public class Fractal {
 //        }
     }
     
+    public void loadMandelbrot(double k){
+        functionOfZ = new Mandelbrot(k);
+        reset();
+    }
+    
     public void reset(){
         centre = functionOfZ.defaultCentre();
         zoom = functionOfZ.defaultZoom();
@@ -520,21 +528,34 @@ public class Fractal {
         return offset;
     }
 
+    private Complex pixelToComplex(int x, int y, double adjustedZoom){
+        Vector diff = new Vector((double)(x - width/2),(double)(y-height/2));
+        
+        diff = diff.multiply(adjustedZoom);
+        
+        Vector c = centre.add(diff);
+        
+        return new Complex(c.x, c.y);
+    }
+    
     public void generateStrip(int x1, int x2) {
-        Vector offset = offset(drawCentre, drawZoom);
-        double adjustedZoom = drawZoom / (double) width;
+        //Vector offset = offset(drawCentre, drawZoom);
+        double adjustedZoom = drawZoom / (double)Math.min(width,height);
         for (int x = x1; x < x2; x++) {
             for (int y = 0; y < height; y++) {
-                Vector p = new Vector(x, height - y - 1);
+                //Vector p = new Vector(x, y);//height - y - 1
                 //get p to be relative to offset in the complex plain
-                p = p.multiply(adjustedZoom);
-                //offset is the top left on the viewport on the complex plain
-                p = p.add(offset);
+//                p = p.multiply(adjustedZoom);
+//                //offset is the top left on the viewport on the complex plain
+//                p = p.add(offset);
 
-                Complex c = new Complex(p.x, p.y);
+                //Complex c = new Complex(p.x, p.y);
+                
+                Complex c = pixelToComplex(x,y,adjustedZoom);
+                
                 Complex z = new Complex(0, 0);
                 Color colour = functionOfZ.iterations(z, c, drawDetail);
-                bufferImage.setRGB(x, height - y - 1, colour.getRGB());
+                bufferImage.setRGB(x, y, colour.getRGB());
             }
         }
     }

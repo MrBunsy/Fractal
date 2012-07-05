@@ -27,8 +27,27 @@ public class Mandelbrot implements FunctionOfZ{
     
     public double defaultCycleMultiplier = 30;
     public double defaultCycleOffset = 0;
+    public Vector defaultCentre = new Vector(-0.5, 0);
+    
+    protected double k;
+    
+    public Mandelbrot(double _k){
+        
+        if(_k>2){
+            defaultCycleMultiplier=5;
+            defaultCentre = new Vector(0, 0);
+        }
+        
+        cycleMultiplier=defaultCycleMultiplier;
+        cycleOffset=defaultCycleOffset;
+        
+        smoothColour=true;
+        
+        k=_k;
+    }
     
     public Mandelbrot(double _cycleMultiplier,boolean _smoothColour){//, Fractal _fractal){
+        k=2;
         cycleMultiplier=_cycleMultiplier;
         cycleOffset=0;
         smoothColour=_smoothColour;
@@ -51,7 +70,21 @@ public class Mandelbrot implements FunctionOfZ{
     }
     
     protected Complex newZ(Complex z, Complex c){
-        return z.times(z).plus(c);
+        //TODO potentially see if all the prime factors are 2 and then use only powers of 2.
+        switch((int)k){
+            case 8:
+                z=z.times(z);
+            case 4:
+                z=z.times(z);
+            case 2:
+                z=z.times(z);
+                break;
+            default:
+                //this is VERY slow
+                z = z.power(k);
+                break;
+        }
+        return z.plus(c);
     }
     
     public static boolean isPointIn(Complex c){
@@ -104,12 +137,14 @@ public class Mandelbrot implements FunctionOfZ{
             //don't know why :/
             //TODO work out why?
             //http://www.vb-helper.com/howto_net_mandelbrot_smooth.html just says that it's not exact and using a later z reduces the error.  seems to work.
-            z = newZ(z,c);// i++;
-            z = newZ(z,c);// i++;
-            z = newZ(z,c);// i++;
-            z = newZ(z,c);
-            z = newZ(z,c);
-            s=(double)i +1 - Math.log(Math.log(z.abs()))/Math.log(2.0);// + 1.0
+            if(k==2){
+                z = newZ(z,c);// i++;
+                z = newZ(z,c);// i++;
+                z = newZ(z,c);// i++;
+                z = newZ(z,c);
+                z = newZ(z,c);
+            }
+            s=(double)i +1 - Math.log(Math.log(z.abs()))/Math.log((double)k);// + 1.0
         }
         
         //if(true){
@@ -126,12 +161,12 @@ public class Mandelbrot implements FunctionOfZ{
     }
     
     public String toString(){
-        return "f(z) = z^2 + c, CycleMultiplier: "+cycleMultiplier;
+        return "f(z) = z^"+k+" + c, CycleMultiplier: "+cycleMultiplier;
     }
 
     @Override
     public Vector defaultCentre() {
-        return new Vector(-0.5, 0);
+        return defaultCentre;
     }
 
     @Override

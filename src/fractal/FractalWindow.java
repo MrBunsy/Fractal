@@ -264,6 +264,28 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
             }
         });
         
+        JMenuItem loadMandelbrot4 = new JMenuItem("Mandelbrot with x^n");
+        fractalMenu.add(loadMandelbrot4);
+        loadMandelbrot4.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //fractal.loadMandelbrot(4);
+                String nString = JOptionPane.showInputDialog(rootPane, "f(x) = x^n + c, where n = ", "4");
+                if(nString!=null){
+                    fractal.loadMandelbrot(Double.parseDouble(nString));
+                }
+            }
+        });
+        
+//        JMenuItem loadMandelbrot8 = new JMenuItem("Mandelbrot with x^8");
+//        fractalMenu.add(loadMandelbrot8);
+//        loadMandelbrot8.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                fractal.loadMandelbrot(8);
+//            }
+//        });
+        
         JMenuItem loadShip = new JMenuItem("Burning Ship");
         fractalMenu.add(loadShip);
         loadShip.addActionListener(new ActionListener() {
