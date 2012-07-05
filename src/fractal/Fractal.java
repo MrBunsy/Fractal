@@ -662,6 +662,12 @@ public class Fractal {
         //f.setProgressMonitor(progressMonitor);
         f.setUpscale(scaleDown);
     }
+    
+    public void saveCertainRez(String filename, int w, int h, int aaLevel, ProgressMonitor pm){
+        Fractal f = new Fractal(w*aaLevel, h*aaLevel, threads, functionOfZ, detail, zoom, centre, filename, aaLevel > 1, pm);
+        //f.setProgressMonitor(progressMonitor);
+        f.setUpscale(aaLevel);
+    }
 
     public void save(String filename, boolean aa, boolean info) {
         try {
