@@ -22,6 +22,8 @@ public interface FunctionOfZ {
     
     public double defaultZoom();
     
+    public FractalSettings defaultSettings();
+    
     @Override
     public String toString();
 }

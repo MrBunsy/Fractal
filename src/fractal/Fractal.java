@@ -308,6 +308,27 @@ public class Fractal {
         generate();
     }
 
+    public int getThreads(){
+        return threads;
+    }
+    
+    public FractalSettings exportSettings(){
+        return new FractalSettings(zoom, detail, centre, functionOfZ);
+    }
+    
+    public void loadSettings(FractalSettings settings){
+        zoom=settings.zoom;
+        centre=settings.centre;
+        detail=settings.detail;
+        functionOfZ=settings.fz;
+        generate();
+    }
+    
+    public void cancelGenerate(){
+        cancelGeneration=true;
+        needReGenerate=false;
+    }
+    
     public void loadBurningShip() {
         functionOfZ = new BurningShip(30, true);
         reset();

@@ -15,6 +15,10 @@ public class FractalPanel extends javax.swing.JPanel {
     private Fractal fractal;
     private Point mouseDown;
     
+    public void setFractal(Fractal f){
+        fractal=f;
+    }
+    
     public FractalPanel(Fractal _fractal, int width, int height){
         
         fractal=_fractal;

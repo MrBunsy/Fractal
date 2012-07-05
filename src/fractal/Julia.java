@@ -34,6 +34,11 @@ public class Julia implements FunctionOfZ{
         return 3d;
     }
     
+    @Override
+    public FractalSettings defaultSettings() {
+        return new FractalSettings(defaultZoom(), defaultDetail(), defaultCentre(), this);
+    }
+    
     public static enum ColourType{
         COSINE,NONE
     }

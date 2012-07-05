@@ -32,6 +32,8 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 
@@ -55,7 +57,12 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
     
     private int width,height;
     
+    private int xPadding,yPadding;
+    
     private ProgressMonitor progMon;
+    
+    private JMenu exportMenu;
+    private JMenuBar menuBar;
     
     private final JFrame thisPanel = this;
     
@@ -68,7 +75,9 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
         
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         
-        setResizable(false);
+        //setResizable(false);
+        
+        
         
         
         setupMenus();
@@ -91,7 +100,7 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
 //        statusPanel.add(statusLabel);
         addStatusPanel();
         //to make up for the status bar at the bottom
-        height+=20;
+        //height+=20;
         //height+=getHeight();
         
         //setupProgressPanel();
@@ -108,7 +117,10 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
         setVisible(true);
         
         
-
+        //do this last
+        Dimension d = getSize();
+        xPadding=d.width-width;
+        yPadding=d.height-height;
         //progMon.setProgress(2);
         
         addKeyListener(new java.awt.event.KeyAdapter() {
@@ -116,6 +128,42 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
                 key(evt);
             }
         });
+        
+        
+        addComponentListener(new ComponentAdapter() {
+        public void componentResized(ComponentEvent e){
+            beenResized(e);
+        }});
+    }
+    
+    private void beenResized(ComponentEvent e){
+        FractalSettings s = fractal.exportSettings();
+        fractal.cancelGenerate();
+
+        Dimension d = getSize();
+        
+        width=d.width-xPadding;
+        height = d.height-yPadding;
+        
+        fractal = new Fractal(width,height, true, fractal.getThreads());
+        fractal.setWindow(this);
+
+
+
+        fractal.loadSettings(s);
+
+        //panel.setPreferredSize(new Dimension(width,height));
+        panel.setFractal(fractal);
+        
+        menuBar.remove(exportMenu);
+        
+        setupExportMenu();
+        
+        menuBar.add(exportMenu, 3);
+        
+        
+////                
+////                pack();
     }
     
     @Override
@@ -186,11 +234,11 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
     private void setupMenus(){
         
         
-        JMenuBar menuBar=new JMenuBar();
+        menuBar=new JMenuBar();
         
         JMenu fractalMenu = new JMenu("Fractal");
         JMenu colourMenu = new JMenu("Colours");
-        JMenu exportMenu = new JMenu("Export");
+//        exportMenu = new JMenu("Export");
         JMenu controlMenu = new JMenu("Controls");
         JMenu helpMenu = new JMenu("Help");
         
@@ -274,6 +322,54 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
             }
         });
         
+        
+        
+        // ------------------- Help Menu -------------------
+        
+        
+        JMenuItem help = new JMenuItem("Help");
+        helpMenu.add(help);
+        help.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(thisPanel, 
+                        "Use the arrow keys or click and drag the cursor to move the viewport."+
+                        "\nThe mouse scroll wheel or Control Menu will zoom in and out."+
+                        "\n+/- keys or the Control menu can change the detail level.\n Higher detail levels take longer to render."
+                        , "Help - JavaFractal", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+        
+        JMenuItem about = new JMenuItem("About");
+        helpMenu.add(about);
+        about.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(thisPanel, 
+                        "JavaFractal is Copyright (c) Luke Wallin 2012"+
+                        "\nReleased under LPGL"+
+                        "\nwww.lukewallin.co.uk/graphics/fractals"+
+                        "\nluke.wallin@gmail.com", "JavaFractal revision 27", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+        
+        setupExportMenu();
+        
+        menuBar.add(fractalMenu);
+        menuBar.add(colourMenu);
+        menuBar.add(controlMenu);
+        menuBar.add(exportMenu);
+        menuBar.add(helpMenu);
+        
+        
+        
+        setJMenuBar(menuBar);
+    }
+    
+    private void setupExportMenu(){
+        
+        exportMenu = new JMenu("Export");
+        
         // ------------------- Export Menu -------------------
         
         JMenuItem standardExport = new JMenuItem("Info + Preview");
@@ -349,47 +445,7 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
                 fractal.saveBig(filename, 16, false,progressMonitor);
             }
         });
-        
-        // ------------------- Help Menu -------------------
-        
-        
-        JMenuItem help = new JMenuItem("Help");
-        helpMenu.add(help);
-        help.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(thisPanel, 
-                        "Use the arrow keys or click and drag the cursor to move the viewport."+
-                        "\nThe mouse scroll wheel or Control Menu will zoom in and out."+
-                        "\n+/- keys or the Control menu can change the detail level.\n Higher detail levels take longer to render."
-                        , "Help - JavaFractal", JOptionPane.INFORMATION_MESSAGE);
-            }
-        });
-        
-        JMenuItem about = new JMenuItem("About");
-        helpMenu.add(about);
-        about.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(thisPanel, 
-                        "JavaFractal is Copyright (c) Luke Wallin 2012"+
-                        "\nReleased under LPGL"+
-                        "\nwww.lukewallin.co.uk/graphics/fractals"+
-                        "\nluke.wallin@gmail.com", "JavaFractal revision 27", JOptionPane.INFORMATION_MESSAGE);
-            }
-        });
-        
-        menuBar.add(fractalMenu);
-        menuBar.add(colourMenu);
-        menuBar.add(controlMenu);
-        menuBar.add(exportMenu);
-        menuBar.add(helpMenu);
-        
-        
-        setJMenuBar(menuBar);
     }
-    
-    
     
     public void paint(Graphics g){
         super.paint(g);
@@ -405,10 +461,38 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
         fractal.key(key);
     }
     
+//    @Override
 //    public void validate(){
 //        super.validate();
+////        if(oldDims!=null){
+////            Dimension dims = getSize();
+////            int dx = dims.width - oldDims.width;
+////            int dy = dims.height - oldDims.height;
+////
+////            width+=dx;
+////            height+=dy;
+////            if(dx !=0 && dy!=0){
+////                FractalSettings s = fractal.exportSettings();
+////                fractal.cancelGenerate();
+////
+////
+////                fractal = new Fractal(width, height, true, fractal.getThreads());
+////                fractal.setWindow(this);
+////
+////
+////
+////                fractal.loadSettings(s);
+////
+////                panel.setPreferredSize(new Dimension(width,height));
+////                panel.setFractal(fractal);
+////                
+////                pack();
+////
+////                oldDims=dims;
+////            }
+////        }
 //        
-//        //Dimension dims = getSize();
+//        
 //    }
 
     @Override

@@ -45,4 +45,9 @@ public class BurningShip extends Mandelbrot{
     public Vector defaultCentre(){
         return new Vector(-0.4, -0.5);
     }
+    
+    @Override
+    public FractalSettings defaultSettings() {
+        return new FractalSettings(defaultZoom(), defaultDetail(), defaultCentre(), this);
+    }
 }

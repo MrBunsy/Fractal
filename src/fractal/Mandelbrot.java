@@ -112,5 +112,10 @@ public class Mandelbrot implements FunctionOfZ{
     public double defaultZoom() {
         return 3.0;
     }
+
+    @Override
+    public FractalSettings defaultSettings() {
+        return new FractalSettings(defaultZoom(), defaultDetail(), defaultCentre(), this);
+    }
     
 }
