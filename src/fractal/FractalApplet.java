@@ -55,7 +55,7 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
 //        
         //FunctionOfZ fz = new Mandelbrot(30,false);
         //FunctionOfZ fz = new Julia(new Complex(0,1), Julia.ColourType.COSINE);
-        fractal = new Fractal(d.width, d.height,false,2);//,fz
+        fractal = new Fractal(d.width, d.height,false,Runtime.getRuntime().availableProcessors());//,fz
         fractal.setWindow(this);
         
        width=d.width;

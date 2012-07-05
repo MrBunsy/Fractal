@@ -18,7 +18,6 @@
  */
 package fractal;
 
-import LukesBits.Colour;
 import LukesBits.Complex;
 import LukesBits.Image;
 import LukesBits.Vector;
@@ -32,7 +31,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -51,8 +49,17 @@ import javax.swing.ProgressMonitor;
  * TODO - cancel a generation and start again if something changes? DONE
  *
  * TODO check that images folder exists and create if not
+ * -DONE (bodge)
  *
  * TODO put reset info in FunctionOfZ so each fractal can reset properly
+ * DONE
+ * 
+ * TODO - proper resizing?
+ * 
+ * TODO mouse stuff is offset up the menu - fix this
+ * -DONE
+ * 
+ * also work out if fractal is upside down
  *
  */
 public class Fractal {
@@ -78,8 +85,6 @@ public class Fractal {
     private Thread[] threadClasses;
     private FunctionOfZ functionOfZ;
     private ProgressMonitor progressMonitor;
-    //parameter used for juliet sets
-    private Complex juliaMu;
 
     public static void printUsage() {
         System.out.println("Usage: "
@@ -429,7 +434,8 @@ public class Fractal {
     }
 
     public void scroll(int scroll) {
-        Point m = window.getMousePosition();
+        Point m = window.getMousePosition(true);
+
 
         if (m != null) {
             Vector mouseScreen = new Vector(m.x, m.y);

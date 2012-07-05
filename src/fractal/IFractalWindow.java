@@ -24,11 +24,13 @@ import java.awt.Point;
  *
  * this interface exists to make things simpler to have both an applet and a standalone version
  * 
+ * note - I'm not sure it has actually helped :/
+ * 
  * @author Luke
  */
 public interface IFractalWindow {
     public void repaint();
-    public Point getMousePosition();
+    public Point getMousePosition(boolean relative);
     //how much has been generated?
 //    public void generating(double progress);
 //    public void finishedGenerating();

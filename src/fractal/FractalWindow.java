@@ -29,6 +29,7 @@ import LukesBits.Vector;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
@@ -115,7 +116,12 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
                 key(evt);
             }
         });
-        
+    }
+    
+    @Override
+    public Point getMousePosition(boolean children){
+        //so that scrolling takes into acount the mouse in the right place
+        return panel.getMousePosition();
     }
     
 //    private void setupProgressDialogue(){
@@ -337,7 +343,7 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
             @Override
             public void actionPerformed(ActionEvent e) {
                 
-                String filename = fractal.getFileName()+"_8aa";
+                String filename = fractal.getFileName()+"_huge";
                 progressMonitor = new ProgressMonitor(thisPanel, "Exporting to "+filename+".png", null, 0, width+1);
                 progressMonitor.setMillisToDecideToPopup(0);
                 fractal.saveBig(filename, 16, false,progressMonitor);
