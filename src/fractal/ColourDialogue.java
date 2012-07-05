@@ -3,13 +3,12 @@
  */
 package fractal;
 
+import java.awt.Component;
 import java.awt.GridLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 /**
  *
@@ -23,9 +22,11 @@ class ColourDialogue extends JDialog{
     private JTextField cycleMultiplierField,cycleOffsetField;
     public final JDialog thisPanel=this;
     
-    public ColourDialogue(FunctionOfZ _fz,Fractal _fractal){
+    public ColourDialogue(FunctionOfZ _fz,Fractal _fractal, Component window){
         fz=_fz;
         fractal=_fractal;
+        
+        setTitle("Colour Settings");
         
         //rows, cols, spacing
         setLayout(new GridLayout(3,3,10,10));
@@ -67,6 +68,10 @@ class ColourDialogue extends JDialog{
         });
         
         pack();
+        
+        setResizable(false);
+        
+        setLocationRelativeTo(window);
     }
     
     public void open(){

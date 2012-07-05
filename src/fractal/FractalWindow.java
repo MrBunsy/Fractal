@@ -282,6 +282,16 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
             }
         });
         
+        JMenuItem loadCustomJulia = new JMenuItem("Custom Julia Quadratic");
+        fractalMenu.add(loadCustomJulia);
+        loadCustomJulia.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                CustomJuliaDialogue d = new CustomJuliaDialogue(fractal,thisPanel);
+                d.setVisible(true);
+            }
+        });
+        
         // ------------------- Colour Menu -------------------
         JMenuItem resetColour = new JMenuItem("Reset");
         colourMenu.add(resetColour);
@@ -300,7 +310,7 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
             public void actionPerformed(ActionEvent e) {
                 //fractal.loadSettings(new Vector(0,0,0), 3, 50);
                 //fractal.openColourDialogue();
-                ColourDialogue d = new ColourDialogue(fractal.getFunctionOfZ(),fractal);
+                ColourDialogue d = new ColourDialogue(fractal.getFunctionOfZ(),fractal,thisPanel);
                 d.open();
             }
         });

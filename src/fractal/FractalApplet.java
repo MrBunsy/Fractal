@@ -95,8 +95,9 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
         
         JMenu fractalMenu = new JMenu("Fractal");
         JMenu colourMenu = new JMenu("Colours");
-        //JMenu exportMenu = new JMenu("Export");
+//        exportMenu = new JMenu("Export");
         JMenu controlMenu = new JMenu("Controls");
+        JMenu windowMenu = new JMenu("Window");
         JMenu helpMenu = new JMenu("Help");
         
         // ------------------- Fractal Menu -------------------
@@ -128,16 +129,48 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
             }
         });
         
+        JMenuItem loadCustomJulia = new JMenuItem("Custom Julia Quadratic");
+        fractalMenu.add(loadCustomJulia);
+        loadCustomJulia.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                CustomJuliaDialogue d = new CustomJuliaDialogue(fractal,thisPanel);
+                d.setVisible(true);
+            }
+        });
+        
         // ------------------- Colour Menu -------------------
+        JMenuItem resetColour = new JMenuItem("Reset");
+        colourMenu.add(resetColour);
+        resetColour.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //fractal.loadSettings(new Vector(0,0,0), 3, 50);
+                fractal.resetColour();
+            }
+        });
+        
+        JMenuItem changeColour = new JMenuItem("Custom");
+        colourMenu.add(changeColour);
+        changeColour.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //fractal.loadSettings(new Vector(0,0,0), 3, 50);
+                //fractal.openColourDialogue();
+                ColourDialogue d = new ColourDialogue(fractal.getFunctionOfZ(),fractal,thisPanel);
+                d.open();
+            }
+        });
         
         
         // ------------------- Control Menu -------------------
-        JMenuItem reset = new JMenuItem("Reset");
+        JMenuItem reset = new JMenuItem("Reset View");
         controlMenu.add(reset);
         reset.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                fractal.loadSettings(new Vector(0,0,0), 3, 50);
+                //fractal.loadSettings(new Vector(0,0,0), 3, 50);
+                fractal.reset();
             }
         });
         
@@ -179,7 +212,6 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
         });
         
         
-        
         // ------------------- Help Menu -------------------
         
         
@@ -209,11 +241,12 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
             }
         });
         
+        
         menuBar.add(fractalMenu);
         menuBar.add(colourMenu);
         menuBar.add(controlMenu);
-        //menuBar.add(exportMenu);
         menuBar.add(helpMenu);
+        
         
         
         setJMenuBar(menuBar);

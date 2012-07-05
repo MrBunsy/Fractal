@@ -365,6 +365,11 @@ public class Fractal {
 //        }
     }
 
+    public void loadCustomJuliaQuadratic(Complex mu){
+        functionOfZ = new Julia(mu, Julia.ColourType.COSINE);
+        reset();
+    }
+    
     public void key(int key) {
         //TODO WASD too?
         switch (key) {
