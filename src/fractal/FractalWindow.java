@@ -226,7 +226,8 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
         reset.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                fractal.loadSettings(new Vector(0,0,0), 3, 50);
+                //fractal.loadSettings(new Vector(0,0,0), 3, 50);
+                fractal.reset();
             }
         });
         

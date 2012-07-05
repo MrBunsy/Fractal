@@ -5,6 +5,7 @@ package fractal;
 
 import LukesBits.Colour;
 import LukesBits.Complex;
+import LukesBits.Vector;
 import java.awt.Color;
 
 /**
@@ -17,6 +18,21 @@ public class Julia implements FunctionOfZ{
     private ColourType colour;
     //private Colour background;
     //private 
+
+    @Override
+    public Vector defaultCentre() {
+        return new Vector(0, 0);
+    }
+
+    @Override
+    public int defaultDetail() {
+        return 1000;
+    }
+
+    @Override
+    public double defaultZoom() {
+        return 3d;
+    }
     
     public static enum ColourType{
         COSINE,NONE

@@ -4,6 +4,7 @@
 package fractal;
 
 import LukesBits.Complex;
+import LukesBits.Vector;
 import java.awt.Color;
 
 /**
@@ -28,5 +29,20 @@ public class BurningShip extends Mandelbrot{
     @Override
     public String toString(){
         return "f(z) = (|Re(z)| + i|Im(z)|)^2 + c, CycleMultiplier: "+cycleMultiplier;
+    }
+    
+    @Override
+    public double defaultZoom(){
+        return 3.5;
+    }
+    
+    @Override
+    public int defaultDetail(){
+        return 50;
+    }
+    
+    @Override
+    public Vector defaultCentre(){
+        return new Vector(-0.4, -0.5);
     }
 }

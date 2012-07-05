@@ -5,6 +5,7 @@ package fractal;
 
 import LukesBits.Colour;
 import LukesBits.Complex;
+import LukesBits.Vector;
 import java.awt.Color;
 
 /**
@@ -95,6 +96,21 @@ public class Mandelbrot implements FunctionOfZ{
     
     public String toString(){
         return "f(z) = z^2 + c, CycleMultiplier: "+cycleMultiplier;
+    }
+
+    @Override
+    public Vector defaultCentre() {
+        return new Vector(-0.5, 0);
+    }
+
+    @Override
+    public int defaultDetail() {
+        return 50;
+    }
+
+    @Override
+    public double defaultZoom() {
+        return 3.0;
     }
     
 }
