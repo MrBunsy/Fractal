@@ -24,6 +24,18 @@ public interface FunctionOfZ {
     
     public FractalSettings defaultSettings();
     
+    public void resetColour();
+    
+    //public void openColourDialogue();
+    
+    public double getCycleMultiplier();
+    public double getCycleOffset();
+    public double getDefaultCycleOffset();
+    public double getDefaultCycleMultiplier();
+    
+    public void setCycleMultiplier(double _cycleMultiplier);
+    public void setCycleOffset(double _cycleOffset);
+    
     @Override
     public String toString();
 }

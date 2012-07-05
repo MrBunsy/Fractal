@@ -283,6 +283,27 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
         });
         
         // ------------------- Colour Menu -------------------
+        JMenuItem resetColour = new JMenuItem("Reset");
+        colourMenu.add(resetColour);
+        resetColour.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //fractal.loadSettings(new Vector(0,0,0), 3, 50);
+                fractal.resetColour();
+            }
+        });
+        
+        JMenuItem changeColour = new JMenuItem("Custom");
+        colourMenu.add(changeColour);
+        changeColour.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //fractal.loadSettings(new Vector(0,0,0), 3, 50);
+                //fractal.openColourDialogue();
+                ColourDialogue d = new ColourDialogue(fractal.getFunctionOfZ(),fractal);
+                d.open();
+            }
+        });
         
         
         // ------------------- Control Menu -------------------

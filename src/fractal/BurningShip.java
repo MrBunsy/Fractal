@@ -16,8 +16,13 @@ import java.awt.Color;
  */
 public class BurningShip extends Mandelbrot{
     
+    
+    
     public BurningShip(double _cycleMultiplier,boolean _smoothColour){
         super(_cycleMultiplier, _smoothColour);
+        defaultCycleMultiplier = 15;
+        defaultCycleOffset = 0.65;
+        resetColour();
     }
     
     @Override

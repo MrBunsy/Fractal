@@ -7,6 +7,11 @@ import LukesBits.Colour;
 import LukesBits.Complex;
 import LukesBits.Vector;
 import java.awt.Color;
+import java.awt.Dialog;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.*;
 
 /**
  *
@@ -15,11 +20,34 @@ import java.awt.Color;
 public class Mandelbrot implements FunctionOfZ{
 
     protected double cycleMultiplier;
+    protected double cycleOffset;
     protected boolean smoothColour;
+    //protected ColourPane colourChooser;
+    protected Fractal fractal;
     
-    public Mandelbrot(double _cycleMultiplier,boolean _smoothColour){
+    public double defaultCycleMultiplier = 30;
+    public double defaultCycleOffset = 0;
+    
+    public Mandelbrot(double _cycleMultiplier,boolean _smoothColour){//, Fractal _fractal){
         cycleMultiplier=_cycleMultiplier;
+        cycleOffset=0;
         smoothColour=_smoothColour;
+        
+        //not entirely sure if having this reference back again is a good thing, but it's needed atm for the colour stuff
+        //fractal=_fractal;
+        
+//        colourChooser=new JDialog((Dialog)null, "Colour Options");
+//        colourChooser.add(new ColourPane(this));
+//        
+//        colourChooser.pack();
+        
+        //colourChooser=new ColourPane(this);
+    }
+    
+    @Override
+    public void resetColour(){
+        cycleMultiplier=defaultCycleMultiplier;
+        cycleOffset=defaultCycleOffset;
     }
     
     protected Complex newZ(Complex z, Complex c){
@@ -75,10 +103,13 @@ public class Mandelbrot implements FunctionOfZ{
             // extra incrementations seems to help the smoothness - http://www.codeproject.com/Articles/18361/Mandelbrot-Set-with-Smooth-Drawing
             //don't know why :/
             //TODO work out why?
-            z = newZ(z,c); i++;
-            z = newZ(z,c); i++;
-            z = newZ(z,c); i++;
-            s=(double)i - Math.log(Math.log(z.abs()))/Math.log(2.0);// + 1.0
+            //http://www.vb-helper.com/howto_net_mandelbrot_smooth.html just says that it's not exact and using a later z reduces the error.  seems to work.
+            z = newZ(z,c);// i++;
+            z = newZ(z,c);// i++;
+            z = newZ(z,c);// i++;
+            z = newZ(z,c);
+            z = newZ(z,c);
+            s=(double)i +1 - Math.log(Math.log(z.abs()))/Math.log(2.0);// + 1.0
         }
         
         //if(true){
@@ -88,7 +119,7 @@ public class Mandelbrot implements FunctionOfZ{
             double cycleSize = Math.log(detail) * cycleMultiplier;
             //double s = (double)i + 1.0 - Math.log(Math.log(z.abs()))/Math.log(2.0);
             //double colour = (double) i % cycleSize / cycleSize;
-            double colour =  s % cycleSize / cycleSize;
+            double colour =  (s + cycleOffset*cycleSize) % cycleSize / cycleSize;
             //return Colour.hsvToRgb(colour, 0.8, 1.0);
             return Color.getHSBColor((float)colour, 0.8f, 1.0f);
        // }
@@ -117,5 +148,42 @@ public class Mandelbrot implements FunctionOfZ{
     public FractalSettings defaultSettings() {
         return new FractalSettings(defaultZoom(), defaultDetail(), defaultCentre(), this);
     }
+
+//    public void openColourDialogue() {
+//        //colourChooser.setVisible(true);
+//        colourChooser.open();
+//    }
+
+    @Override
+    public double getCycleMultiplier() {
+        return cycleMultiplier;
+    }
+
+    @Override
+    public double getCycleOffset() {
+        return cycleOffset;
+    }
+
+    @Override
+    public double getDefaultCycleOffset() {
+        return defaultCycleOffset;
+    }
+
+    @Override
+    public double getDefaultCycleMultiplier() {
+       return defaultCycleMultiplier;
+    }
+
+    @Override
+    public void setCycleMultiplier(double _cycleMultiplier) {
+        cycleMultiplier=_cycleMultiplier;
+    }
+
+    @Override
+    public void setCycleOffset(double _cycleOffset) {
+        cycleOffset=_cycleOffset;
+    }
     
 }
+
+

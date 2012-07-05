@@ -60,6 +60,9 @@ import javax.swing.ProgressMonitor;
  * -DONE
  * 
  * also work out if fractal is upside down
+ * 
+ * 
+ * idea - make the colour dialogue part of functionOfZ, that way the different options for julia and mandelbrot stuff can be dealt with?
  *
  */
 public class Fractal {
@@ -307,10 +310,24 @@ public class Fractal {
         detail = functionOfZ.defaultDetail();
         generate();
     }
+    
+    public void resetColour(){
+        functionOfZ.resetColour();
+        generate();
+    }
 
     public int getThreads(){
         return threads;
     }
+    
+    public FunctionOfZ getFunctionOfZ(){
+        return functionOfZ;
+    }
+    
+    
+//    public void openColourDialogue(){
+//        functionOfZ.openColourDialogue();
+//    }
     
     public FractalSettings exportSettings(){
         return new FractalSettings(zoom, detail, centre, functionOfZ);

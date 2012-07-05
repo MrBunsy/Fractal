@@ -16,6 +16,14 @@ public class Julia implements FunctionOfZ{
 
     private Complex mu;
     private ColourType colour;
+    
+    protected double cycleMultiplier;
+    protected double cycleOffset;
+    protected boolean smoothColour;
+    
+    public double defaultCycleMultiplier = 50;
+    public double defaultCycleOffset = 0.5;
+    
     //private Colour background;
     //private 
 
@@ -35,9 +43,46 @@ public class Julia implements FunctionOfZ{
     }
     
     @Override
+    public double getCycleMultiplier() {
+        return cycleMultiplier;
+    }
+
+    @Override
+    public double getCycleOffset() {
+        return cycleOffset;
+    }
+
+    @Override
+    public double getDefaultCycleOffset() {
+        return defaultCycleOffset;
+    }
+
+    @Override
+    public double getDefaultCycleMultiplier() {
+       return defaultCycleMultiplier;
+    }
+
+    @Override
+    public void setCycleMultiplier(double _cycleMultiplier) {
+        cycleMultiplier=_cycleMultiplier;
+    }
+
+    @Override
+    public void setCycleOffset(double _cycleOffset) {
+        cycleOffset=_cycleOffset;
+    }
+
+    @Override
     public FractalSettings defaultSettings() {
         return new FractalSettings(defaultZoom(), defaultDetail(), defaultCentre(), this);
     }
+
+    @Override
+    public void resetColour() {
+        cycleMultiplier=defaultCycleMultiplier;
+        cycleOffset=defaultCycleOffset;
+    }
+
     
     public static enum ColourType{
         COSINE,NONE
@@ -46,6 +91,9 @@ public class Julia implements FunctionOfZ{
     public Julia(Complex _mu, ColourType _colour){//, Colour _background){
         mu=_mu;
         colour=_colour;
+        
+        cycleMultiplier=defaultCycleMultiplier;
+        cycleOffset=defaultCycleOffset;
     }
     
     @Override
@@ -93,9 +141,9 @@ public class Julia implements FunctionOfZ{
                     
                      double s=(double)i - Math.log(Math.log(c.abs()))/Math.log(2.0);// + 1.0
                     
-                     double cycleSize = Math.log(detail) * 50;
+                     double cycleSize = Math.log(detail) * cycleMultiplier;
 
-                     double co = ( s + cycleSize/2) % cycleSize / cycleSize;
+                     double co = ( s + cycleSize*cycleOffset) % cycleSize / cycleSize;
                     
                      return Color.getHSBColor((float)co, 0.5f, 1.0f);
                      //return Colour.red.dim(s).toColor();
