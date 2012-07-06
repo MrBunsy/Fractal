@@ -48,7 +48,7 @@ public class GoToDialogue extends JDialog{
         
         JLabel zoomText = new JLabel("Zoom = ");
         add(zoomText);
-        zoom = new JTextField(fractal.getFunctionOfZ().defaultZoom()+"");
+        zoom = new JTextField(fractal.getZoom()+"");
         add(zoom);
         
         JButton cancel = new JButton("Cancel");

@@ -76,21 +76,62 @@ public class Mandelbrot implements FunctionOfZ{
         cycleOffset=defaultCycleOffset;
     }
     
+    //http://www.skorks.com/2010/10/write-a-function-to-determine-if-a-number-is-a-power-of-2/
+    public static boolean isPowerOf2(int value){
+        if (value < 2) {
+            return false;
+        } else {
+            return Integer.bitCount(value) == 1;
+        }
+    }
+    
     protected Complex newZ(Complex z, Complex c){
         //TODO potentially see if all the prime factors are 2 and then use only powers of 2.
-        switch((int)k){
-            case 8:
-                z=z.times(z);
-            case 4:
-                z=z.times(z);
-            case 2:
-                z=z.times(z);
-                break;
-            default:
-                //this is VERY slow
-                z = z.power(k);
-                break;
+        
+        //speed boost:
+        if((int)k==2){
+            return z.times(z).plus(c);
         }
+        
+        Complex oldZ=z;
+        
+        if(k%1d == 0 ){
+            //whole number
+            if(isPowerOf2((int)k)){
+                //power of 2!
+                //keep squaring z
+                //changing base http://en.wikipedia.org/wiki/Logarithm#Change_of_base
+                int ik = (int)(Math.log(k)/Math.log(2));
+                for(int i=0;i<ik;i++){
+                    z=z.times(z);
+                }
+            }else{
+                //not power of 2
+                //keep multiplying by z
+                int ik = (int)k;
+
+                for(int i=1;i<ik;i++){
+                    z=z.times(oldZ);
+                }
+            }
+        }else{
+            //this is VERY slow
+            z = z.power(k);
+        }
+        
+//        switch((int)k){
+//            case 8:
+//                z=z.times(z);
+//            case 4:
+//                z=z.times(z);
+//            case 2:
+//                z=z.times(z);
+//                break;
+//            default:
+//                //this is VERY slow
+//                z = z.power(k);
+//                break;
+//        }
         return z.plus(c);
     }
     

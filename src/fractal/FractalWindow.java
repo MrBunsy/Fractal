@@ -270,7 +270,7 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
             @Override
             public void actionPerformed(ActionEvent e) {
                 //fractal.loadMandelbrot(4);
-                String nString = JOptionPane.showInputDialog(rootPane, "f(x) = x^n + c, where n = ", "4");
+                String nString = JOptionPane.showInputDialog(rootPane, "f(x) = x^n + c, where n = (can be non-int)", "4");
                 if(nString!=null){
                     fractal.loadMandelbrot(Double.parseDouble(nString));
                 }
