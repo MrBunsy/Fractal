@@ -28,7 +28,7 @@ public class BurningShip extends Mandelbrot{
     @Override
      protected Complex newZ(Complex z, Complex c){
          Complex q = new Complex(Math.abs(z.re()), Math.abs(z.im()));
-         return q.times(q).plus(c);
+         return q.times(q).plus(c.times(-1));
     }
     
     @Override

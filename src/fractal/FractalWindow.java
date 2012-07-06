@@ -444,7 +444,8 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
                 JOptionPane.showMessageDialog(thisPanel, 
                         "Use the arrow keys or click and drag the cursor to move the viewport."+
                         "\nThe mouse scroll wheel or Control Menu will zoom in and out."+
-                        "\n+/- keys or the Control menu can change the detail level.\n Higher detail levels take longer to render."
+                        "\n+/- keys or the Control menu can change the detail level.\n Higher detail levels take longer to render."+
+                        "\nClick on a point to centre the view around it"
                         , "Help - JavaFractal", JOptionPane.INFORMATION_MESSAGE);
             }
         });
