@@ -123,6 +123,10 @@ public class CustomJuliaDialogue extends JDialog{
          setLocationRelativeTo(window);
     }
     
+    public int getThreads(){
+        return fractal.getThreads();
+    }
+    
     public void setMu(Complex mu){
         re.setText(String.valueOf(mu.re()));
         im.setText(String.valueOf(mu.im()));

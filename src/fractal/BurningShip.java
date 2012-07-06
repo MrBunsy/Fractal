@@ -48,7 +48,7 @@ public class BurningShip extends Mandelbrot{
     
     @Override
     public Vector defaultCentre(){
-        return new Vector(-0.4, -0.5);
+        return new Vector(0.4, 0.3);
     }
     
     @Override

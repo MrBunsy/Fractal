@@ -69,10 +69,15 @@ import javax.swing.ProgressMonitor;
  * 
  * idea: click on a point on a complex plain to choose a mu for julia?
  * 
- * TODO - tidy up the Fractal classes so there's a decent base which is extended
+ * TODO - tidy up the functionofZ classes so there's a decent base which is extended
  * also: z is not needed in the arguments for getColourFor
  * 
  * TODO - always save info with every export?
+ * 
+ * TODO tidy up Fractal constructors
+ * 
+ * 
+ * IDEA for animation - julia sets with changing mu :D
  *
  */
 public class Fractal {
@@ -273,11 +278,11 @@ public class Fractal {
     }
 
     //very simple one - currentl used in JuliaSelect
-    public Fractal(int _width, int _height){
+    public Fractal(int _width, int _height, int _threads){
         width = _width;
         height = _height;
         allowSave=false;
-        threads=1;
+        threads=_threads;
         
         functionOfZ = new Mandelbrot(10, false);
         
@@ -409,6 +414,7 @@ public class Fractal {
 //            window.repaint();
 //        }
     }
+    
     
     public void loadCollatz(){
         functionOfZ=new CollatzFractal();
@@ -575,6 +581,10 @@ public class Fractal {
         window.repaint();
     }
 
+    public double getZoom(){
+        return zoom;
+    }
+    
     private void updateZoom(int scroll) {
         if (scroll < 0) {
             zoom *= zoomAdjust;
