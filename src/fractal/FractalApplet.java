@@ -93,11 +93,12 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
         
         JMenuBar menuBar=new JMenuBar();
         
+       
         JMenu fractalMenu = new JMenu("Fractal");
         JMenu colourMenu = new JMenu("Colours");
 //        exportMenu = new JMenu("Export");
         JMenu controlMenu = new JMenu("Controls");
-        JMenu windowMenu = new JMenu("Window");
+        //JMenu windowMenu = new JMenu("Window");
         JMenu helpMenu = new JMenu("Help");
         
         // ------------------- Fractal Menu -------------------
@@ -111,6 +112,28 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
             }
         });
         
+        JMenuItem loadMandelbrot4 = new JMenuItem("'Mandelbrot' with x^n");
+        fractalMenu.add(loadMandelbrot4);
+        loadMandelbrot4.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //fractal.loadMandelbrot(4);
+                String nString = JOptionPane.showInputDialog(rootPane, "f(x) = x^n + c, where n = (can be non-int)", "4");
+                if(nString!=null){
+                    fractal.loadMandelbrot(Double.parseDouble(nString));
+                }
+            }
+        });
+        
+//        JMenuItem loadMandelbrot8 = new JMenuItem("Mandelbrot with x^8");
+//        fractalMenu.add(loadMandelbrot8);
+//        loadMandelbrot8.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                fractal.loadMandelbrot(8);
+//            }
+//        });
+        
         JMenuItem loadShip = new JMenuItem("Burning Ship");
         fractalMenu.add(loadShip);
         loadShip.addActionListener(new ActionListener() {
@@ -119,6 +142,15 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
                 fractal.loadBurningShip();
             }
         });
+        
+//        JMenuItem collatz = new JMenuItem("Collatz");
+//        fractalMenu.add(collatz);
+//        collatz.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                fractal.loadCollatz();
+//            }
+//        });
         
         JMenuItem loadJulia = new JMenuItem("Julia Quadratic");
         fractalMenu.add(loadJulia);
@@ -174,6 +206,15 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
             }
         });
         
+        JMenuItem goTo = new JMenuItem("Go To");
+        controlMenu.add(goTo);
+        goTo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                GoToDialogue d = new GoToDialogue(fractal, thisPanel);
+                d.setVisible(true);
+            }
+        });
         
         JMenuItem zoomIn = new JMenuItem("Zoom In");
         controlMenu.add(zoomIn);
@@ -223,7 +264,8 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
                 JOptionPane.showMessageDialog(thisPanel, 
                         "Use the arrow keys or click and drag the cursor to move the viewport."+
                         "\nThe mouse scroll wheel or Control Menu will zoom in and out."+
-                        "\n+/- keys or the Control menu can change the detail level.\n Higher detail levels take longer to render."
+                        "\n+/- keys or the Control menu can change the detail level.\n Higher detail levels take longer to render."+
+                        "\nClick on a point to centre the view around it"
                         , "Help - JavaFractal", JOptionPane.INFORMATION_MESSAGE);
             }
         });
@@ -241,10 +283,13 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
             }
         });
         
+        //setupExportMenu();
         
         menuBar.add(fractalMenu);
         menuBar.add(colourMenu);
         menuBar.add(controlMenu);
+        //menuBar.add(windowMenu);
+        //menuBar.add(exportMenu);
         menuBar.add(helpMenu);
         
         
