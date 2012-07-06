@@ -295,6 +295,15 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
             }
         });
         
+//        JMenuItem collatz = new JMenuItem("Collatz");
+//        fractalMenu.add(collatz);
+//        collatz.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                fractal.loadCollatz();
+//            }
+//        });
+        
         JMenuItem loadJulia = new JMenuItem("Julia Quadratic");
         fractalMenu.add(loadJulia);
         loadJulia.addActionListener(new ActionListener() {

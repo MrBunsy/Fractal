@@ -96,15 +96,19 @@ public class Julia implements FunctionOfZ{
         cycleOffset=defaultCycleOffset;
     }
     
+    public Complex newC(Complex c){
+        return c.times(c).plus(mu);
+    }
+    
     @Override
-    public Color iterations(Complex z, Complex c, int detail) {
+    public Color getColourFor(Complex z, Complex c, int detail) {
         
         Complex oldC = c;
         
         int i=0;
         while (c.magnitudeSqrd() < 4 && i < detail) {
             oldC=c;
-            c = c.times(c).plus(mu);
+            c = newC(c);
             i++;
         }
         

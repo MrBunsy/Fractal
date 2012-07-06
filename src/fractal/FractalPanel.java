@@ -38,6 +38,10 @@ public class FractalPanel extends javax.swing.JPanel {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 _mousePressed(evt);
             }
+            
+            public void mouseClicked(java.awt.event.MouseEvent evt){
+                _mouseClicked(evt);
+            }
         });
 
         
@@ -47,6 +51,12 @@ public class FractalPanel extends javax.swing.JPanel {
     
     private void _mousePressed(java.awt.event.MouseEvent evt) {
         mouseDown = evt.getPoint();
+    }
+    
+    private void _mouseClicked(java.awt.event.MouseEvent evt) {
+        Point p = evt.getPoint();
+        
+        fractal.setCentre(fractal.pixelToComplex(p.x, p.y));
     }
 
     private void _mouseReleased(java.awt.event.MouseEvent evt) {

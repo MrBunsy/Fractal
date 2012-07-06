@@ -31,6 +31,13 @@ public class Mandelbrot implements FunctionOfZ{
     
     protected double k;
     
+    public Mandelbrot(boolean _smoothColour){
+        k=2;
+        smoothColour=_smoothColour;
+        cycleOffset=defaultCycleOffset;
+        cycleMultiplier=defaultCycleMultiplier;
+    }
+    
     public Mandelbrot(double _k){
         
         if(_k>2){
@@ -104,12 +111,29 @@ public class Mandelbrot implements FunctionOfZ{
         return i<detail;
     }
     
+//    public int iterations(Complex z, Complex c, int detail){
+//        int i=0;
+//        while (z.magnitudeSqrd() < 4 && i < detail) {
+//            //oldZ=z;
+//            z = newZ(z,c);
+//            i++;
+//            //this is for smooth colouring - http://www.hiddendimension.com/FractalMath/Divergent_Fractals_Main.html
+//            //does slow things down a lot though
+////            if(smoothColour){
+////                s = s + Math.exp(-z.abs());
+////            }
+//        }
+//        
+//        return i;
+//    }
+    
     @Override
-    public Color iterations(Complex z, Complex c, int detail) {
+    public Color getColourFor(Complex z, Complex c, int detail) {
         int i=0;
         double s=0;
         
         //Complex oldZ=z;
+        
         
         while (z.magnitudeSqrd() < 4 && i < detail) {
             //oldZ=z;
@@ -121,7 +145,6 @@ public class Mandelbrot implements FunctionOfZ{
 //                s = s + Math.exp(-z.abs());
 //            }
         }
-        
         
         
         if(i==detail){

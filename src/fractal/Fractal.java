@@ -66,6 +66,13 @@ import javax.swing.ProgressMonitor;
  * -didn't do this in the end, would've been messy
  * 
  * todo: tidy up status bar at bottom with more useful info
+ * 
+ * idea: click on a point on a complex plain to choose a mu for julia?
+ * 
+ * TODO - tidy up the Fractal classes so there's a decent base which is extended
+ * also: z is not needed in the arguments for getColourFor
+ * 
+ * TODO - always save info with every export?
  *
  */
 public class Fractal {
@@ -225,6 +232,8 @@ public class Fractal {
 
         init();
 
+        
+        
         generate();
     }
 
@@ -263,6 +272,25 @@ public class Fractal {
 
     }
 
+    //very simple one - currentl used in JuliaSelect
+    public Fractal(int _width, int _height){
+        width = _width;
+        height = _height;
+        allowSave=false;
+        threads=1;
+        
+        functionOfZ = new Mandelbrot(10, false);
+        
+        functionOfZ.setCycleMultiplier(0);
+        
+        
+        
+        reset(false);
+        
+        detail=100;
+        init();
+    }
+    
     //TODO, cull this later?
 //    public Fractal(int _width, int _height, boolean _allowSave, int _threads, FunctionOfZ _functionOfZ) {
 //        width = _width;
@@ -312,11 +340,30 @@ public class Fractal {
         reset();
     }
     
+    public void setDetail(int _detail){
+        detail=_detail;
+    }
+    
+    public void setCentre(Complex c){
+        setCentre(new Vector(c.re(),c.im()));
+    }
+    
+    public void setCentre(Vector v){
+        //TODO  fix upside down bug and repair this
+        v=new Vector(v.x,v.y);
+        centre=v;
+    }
     public void reset(){
+        reset(true);
+    }
+    
+    public void reset(boolean redraw){
         centre = functionOfZ.defaultCentre();
         zoom = functionOfZ.defaultZoom();
         detail = functionOfZ.defaultDetail();
-        generate();
+        if(redraw){
+            generate();
+        }
     }
     
     public void resetColour(){
@@ -361,6 +408,11 @@ public class Fractal {
 //        if (window != null) {
 //            window.repaint();
 //        }
+    }
+    
+    public void loadCollatz(){
+        functionOfZ=new CollatzFractal();
+        reset();
     }
 
     //load a pretty Julia set
@@ -477,7 +529,7 @@ public class Fractal {
         if (down != null) {
             Vector difference = new Vector(up.x - down.x, up.y - down.y);
 
-            centre = centre.subtract(difference, zoom / (double) width);
+            centre = centre.add(difference, zoom / (double) width);
 
             window.repaint();
             generate();
@@ -528,8 +580,13 @@ public class Fractal {
         return offset;
     }
 
+    public Complex pixelToComplex(int x, int y){
+         double adjustedZoom = drawZoom / (double)Math.min(width,height);
+         return pixelToComplex(x, y, adjustedZoom);
+    }
+    
     private Complex pixelToComplex(int x, int y, double adjustedZoom){
-        Vector diff = new Vector((double)(x - width/2),(double)(y-height/2));
+        Vector diff = new Vector((double)(x - width/2),(double)(height/2-y));
         
         diff = diff.multiply(adjustedZoom);
         
@@ -554,8 +611,8 @@ public class Fractal {
                 Complex c = pixelToComplex(x,y,adjustedZoom);
                 
                 Complex z = new Complex(0, 0);
-                Color colour = functionOfZ.iterations(z, c, drawDetail);
-                bufferImage.setRGB(x, y, colour.getRGB());
+                Color colour = functionOfZ.getColourFor(z, c, drawDetail);
+                bufferImage.setRGB(x, height - y - 1, colour.getRGB());
             }
         }
     }
@@ -577,18 +634,40 @@ public class Fractal {
                 progressMonitor.setNote("Generating Image");
             }
 
-            //what xcoord has been drawn up to
-            threadsDrawnTo = 0;
+            if(threads > 1){
+                //what xcoord has been drawn up to
+                threadsDrawnTo = 0;
 
-            for (int t = 0; t < threads; t++) {
-                int drawTo = threadsDrawnTo + 2;
-                if (drawTo > width) {
-                    drawTo = width;
+                for (int t = 0; t < threads; t++) {
+                    int drawTo = threadsDrawnTo + 2;
+                    if (drawTo > width) {
+                        drawTo = width;
+                    }
+                    fractalThreads[t] = new FractalThread(this, threadsDrawnTo, drawTo, t);
+                    threadClasses[t] = new Thread(fractalThreads[t]);
+                    threadClasses[t].start();
+                    threadsDrawnTo += 2;
                 }
-                fractalThreads[t] = new FractalThread(this, threadsDrawnTo, drawTo, t);
-                threadClasses[t] = new Thread(fractalThreads[t]);
-                threadClasses[t].start();
-                threadsDrawnTo += 2;
+
+            }else{
+                
+                //not using threads, just doing it here
+                
+                for(int x=0;x<width;x++){
+                    generateStrip(x, x+1);
+                }
+                
+                cancelGeneration = false;
+                generationInProgress = false;
+                
+                if (window != null) {
+                    window.repaint();
+                }
+                
+                if (saveWhenFinished) {
+                    //if saving when we've finished, we don't need the info string - it's either for an animation or an AA image
+                    save(saveAs, aa, false);
+                }
             }
         } else {
             needReGenerate = true;
