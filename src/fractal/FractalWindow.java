@@ -358,6 +358,15 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
             }
         });
         
+        JMenuItem goTo = new JMenuItem("Go To");
+        controlMenu.add(goTo);
+        goTo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                GoToDialogue d = new GoToDialogue(fractal, thisPanel);
+                d.setVisible(true);
+            }
+        });
         
         JMenuItem zoomIn = new JMenuItem("Zoom In");
         controlMenu.add(zoomIn);
@@ -419,7 +428,7 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
         resize1280_9.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                thisPanel.resizeWindow(1280, 72);
+                thisPanel.resizeWindow(1280, 720);
             }
         });
         
