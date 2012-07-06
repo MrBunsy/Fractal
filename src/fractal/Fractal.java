@@ -87,7 +87,7 @@ public class Fractal {
     //private double averageI;
     //private Colour black = new Colour(0,0,0);
     private Vector centre, drawCentre;
-    private double zoom, drawZoom;
+    private double zoom, drawZoom,adjustedZoom,adjustedDrawZoom;
     private double zoomAdjust = 0.8;
     //how much bigger to make hte big image when saving
     private int upscale;
@@ -527,9 +527,14 @@ public class Fractal {
 
     public void drag(Point down, Point up) {
         if (down != null) {
-            Vector difference = new Vector(up.x - down.x, up.y - down.y);
+            
+            Complex downC = pixelToComplex(down.x, down.y);
+            Complex upC = pixelToComplex(up.x, up.y);
+            
+            //Vector difference = new Vector(up.x - down.x, up.y - down.y);
+            Complex difference = upC.minus(downC);
 
-            centre = centre.add(difference, zoom / (double) width);
+            centre = centre.subtract(difference.toVector());
 
             window.repaint();
             generate();
@@ -541,11 +546,14 @@ public class Fractal {
 
 
         if (m != null) {
-            Vector mouseScreen = new Vector(m.x, m.y);
+            //Vector mouseScreen = new Vector(m.x, m.y);
 
             //mouse position on the complex plain
-            Vector mouseComplex = offset(centre, zoom).add(mouseScreen.multiply(zoom / (double) width));
-
+            //Vector mouseComplex = offset(centre, zoom).add(mouseScreen.multiply(zoom / (double) width));
+            Vector mouseComplex = pixelToComplex(m.x, m.y).toVector();
+            
+            
+            //Vector mouseComplex = new Vector(mouseComplexC.re(),mouseComplexC.im());
             //mouseComplex = offset + mouseScreen*zoomAdjust
             //re-arrange for offset, then deal with change in zoom
             //offset = mouseComplex - mouseScreen*newZoomAdjust
@@ -553,10 +561,13 @@ public class Fractal {
 
             updateZoom(scroll);
 
+            
+            centre = mouseComplex.subtract(new Vector((double)(m.x - width/2),(double)(height/2-m.y)).multiply(adjustedZoom));
+            
             //.add(new Vector(0,1),_zoom*(double)(width-height)/(2.0*(double)width)) is a bodge to get it to work when the aspect ratio isn't 1
             //I'm not entirely sure what's happenning, but it works!
-            Vector newOffset = mouseComplex.subtract(mouseScreen.multiply(zoom / (double) width)).subtract(new Vector(0, 1), zoom * (double) (width - height) / (2.0 * (double) width));
-            centre = newOffset.add(new Vector(zoom / 2.0, zoom / 2.0));
+//            Vector newOffset = mouseComplex.subtract(mouseScreen.multiply(zoom / (double) width)).subtract(new Vector(0, 1), zoom * (double) (width - height) / (2.0 * (double) width));
+//            centre = newOffset.add(new Vector(zoom / 2.0, zoom / 2.0));
         } else {
             updateZoom(scroll);
         }
@@ -570,25 +581,27 @@ public class Fractal {
         } else {
             zoom /= zoomAdjust;
         }
+        
+        adjustedZoom = zoom / (double)Math.min(width,height);
     }
 
-    private Vector offset(Vector _centre, double _zoom) {
-        Vector offset = _centre.subtract(new Vector(1, 1).multiply(_zoom / 2.0));//(double)height/(double)width
-
-        offset = offset.add(new Vector(0, 1), _zoom * (double) (width - height) / (2.0 * (double) width));
-
-        return offset;
-    }
+//    private Vector offset(Vector _centre, double _zoom) {
+//        Vector offset = _centre.subtract(new Vector(1, 1).multiply(_zoom / 2.0));//(double)height/(double)width
+//
+//        offset = offset.add(new Vector(0, 1), _zoom * (double) (width - height) / (2.0 * (double) width));
+//
+//        return offset;
+//    }
 
     public Complex pixelToComplex(int x, int y){
-         double adjustedZoom = drawZoom / (double)Math.min(width,height);
+         //double adjustedZoom = drawZoom / (double)Math.min(width,height);
          return pixelToComplex(x, y, adjustedZoom);
     }
     
-    private Complex pixelToComplex(int x, int y, double adjustedZoom){
+    private Complex pixelToComplex(int x, int y, double _adjustedZoom){
         Vector diff = new Vector((double)(x - width/2),(double)(height/2-y));
         
-        diff = diff.multiply(adjustedZoom);
+        diff = diff.multiply(_adjustedZoom);
         
         Vector c = centre.add(diff);
         
@@ -597,7 +610,7 @@ public class Fractal {
     
     public void generateStrip(int x1, int x2) {
         //Vector offset = offset(drawCentre, drawZoom);
-        double adjustedZoom = drawZoom / (double)Math.min(width,height);
+        //double adjustedZoom = drawZoom / (double)Math.min(width,height);
         for (int x = x1; x < x2; x++) {
             for (int y = 0; y < height; y++) {
                 //Vector p = new Vector(x, y);//height - y - 1
@@ -608,11 +621,11 @@ public class Fractal {
 
                 //Complex c = new Complex(p.x, p.y);
                 
-                Complex c = pixelToComplex(x,y,adjustedZoom);
+                Complex c = pixelToComplex(x,y,adjustedDrawZoom);
                 
                 Complex z = new Complex(0, 0);
                 Color colour = functionOfZ.getColourFor(z, c, drawDetail);
-                bufferImage.setRGB(x, height - y - 1, colour.getRGB());
+                bufferImage.setRGB(x,y , colour.getRGB());//height - y - 1
             }
         }
     }
@@ -626,6 +639,8 @@ public class Fractal {
             drawCentre = centre.copy();
             drawZoom = zoom;
             finishedThreads = 0;
+            adjustedDrawZoom = drawZoom / (double)Math.min(width,height);
+            adjustedZoom = adjustedDrawZoom;
 
             if (progressMonitor != null) {
                 //extra one if we're using AA
