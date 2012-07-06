@@ -69,6 +69,7 @@ public class CustomJuliaDialogue extends JDialog{
          c.gridx=1;
          c.gridy=2;
          c.gridwidth=2;
+         c.ipady=5;
          add(im,c);
          
          //setPreferredSize(new Dimension(200,100));
@@ -79,6 +80,7 @@ public class CustomJuliaDialogue extends JDialog{
          c.gridy=3;
          c.gridwidth=3;
          c.anchor=GridBagConstraints.CENTER;
+         c.ipady=5;
          c.gridheight=3;
          add(p,c);
          

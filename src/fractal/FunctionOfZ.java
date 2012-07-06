@@ -38,4 +38,6 @@ public interface FunctionOfZ {
     
     @Override
     public String toString();
+    
+    public String toString(boolean detailed);
 }

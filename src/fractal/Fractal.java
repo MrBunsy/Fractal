@@ -68,6 +68,7 @@ import javax.swing.ProgressMonitor;
  * todo: tidy up status bar at bottom with more useful info
  * 
  * idea: click on a point on a complex plain to choose a mu for julia?
+ * -done :D
  * 
  * TODO - tidy up the functionofZ classes so there's a decent base which is extended
  * also: z is not needed in the arguments for getColourFor
@@ -864,12 +865,12 @@ public class Fractal {
 
     private String infoString(boolean detailed) {
 
-        return "Centre: " + (detailed ? "(" + centre.x + "," + centre.y + ")" : centre) + ", "
-                + "Zoom: " + zoom + ", "
+        return "Centre: " + (detailed ? "(" + centre.x + "," + centre.y + ")" : centre.toString(true)) + ", "
+                + "Zoom: " + (detailed ? zoom : Math.round(zoom*10000d)/10000d ) + ", "
                 + "Detail: " + detail + ", "
-                + //"Type: "+fractalType.toString()+", "+
-                "Function: " + functionOfZ.toString();
-        //(detailed ? "ColourCycleMultiplier: "+cycleMultiplier : "");
+                //+ (detailed ?  ", Function: " + functionOfZ.toString() : "" );
+                + functionOfZ.toString(detailed);
+                //(detailed ? "ColourCycleMultiplier: "+cycleMultiplier : "");
     }
 
     public synchronized void draw(Graphics g) {//,int width,int height

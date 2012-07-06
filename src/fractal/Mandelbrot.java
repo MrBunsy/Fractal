@@ -150,6 +150,8 @@ public class Mandelbrot implements FunctionOfZ{
         if(i==detail){
             //escaped
             return new Color(0,0,0);
+        }else if(cycleMultiplier==0){
+            return new Color(255,255,255);
         }
         
         if(!smoothColour){
@@ -184,7 +186,12 @@ public class Mandelbrot implements FunctionOfZ{
     }
     
     public String toString(){
-        return "f(z) = z^"+k+" + c, CycleMultiplier: "+cycleMultiplier;
+        return toString(true);
+    }
+    
+    public String toString(boolean detailed){
+        return "f(z) = z^"+k+" + c"
+                + (detailed ? ", CycleMultiplier: "+cycleMultiplier+ ", CycleOffset: "+cycleOffset : "");
     }
 
     @Override

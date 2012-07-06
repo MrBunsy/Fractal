@@ -171,9 +171,14 @@ public class Julia implements FunctionOfZ{
         
     }
     
-    @Override
     public String toString(){
-        return "f(z) = z^2 + "+mu;
+        return toString(true);
+    }
+    
+    @Override
+    public String toString(boolean detailed){
+        return "f(z) = z^2 + "+mu
+                + (detailed ? ", CycleMultiplier:"+cycleMultiplier+ ", CycleOffset: "+cycleOffset : "");
     }
     
 }
