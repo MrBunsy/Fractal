@@ -264,7 +264,7 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
             }
         });
         
-        JMenuItem loadMandelbrot4 = new JMenuItem("Mandelbrot with x^n");
+        JMenuItem loadMandelbrot4 = new JMenuItem("'Mandelbrot' with x^n");
         fractalMenu.add(loadMandelbrot4);
         loadMandelbrot4.addActionListener(new ActionListener() {
             @Override

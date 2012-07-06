@@ -74,14 +74,20 @@ public class CustomJuliaDialogue extends JDialog{
          
          //setPreferredSize(new Dimension(200,100));
          
-         p = new JuliaSelectPanel(200, 150, this);
-         
          c.gridx=0;
          c.gridy=3;
          c.gridwidth=3;
+         add(new JLabel("Click the Mandelbrot to select a value for mu:"),c);
+         
+         
+         p = new JuliaSelectPanel(200, 150, this);
+         
+         c.gridx=0;
+         c.gridy=4;
+         c.gridwidth=3;
          c.anchor=GridBagConstraints.CENTER;
          c.ipady=5;
-         c.gridheight=3;
+         //c.gridheight=3;
          add(p,c);
          
          cancel = new JButton("Reset");
@@ -92,7 +98,7 @@ public class CustomJuliaDialogue extends JDialog{
         });
          c.gridx=0;
          c.gridwidth=1;
-         c.gridy=7;
+         c.gridy=5;
          add(cancel,c);
          
          cancel = new JButton("Cancel");
@@ -102,7 +108,7 @@ public class CustomJuliaDialogue extends JDialog{
             }
         });
          c.gridx=1;
-         c.gridy=7;
+         c.gridy=5;
          c.anchor=GridBagConstraints.LINE_END;
          add(cancel,c);
          
@@ -114,7 +120,7 @@ public class CustomJuliaDialogue extends JDialog{
             }
         });
          c.gridx=2;
-         c.gridy=7;
+         c.gridy=5;
          add(okay,c);
          
          
