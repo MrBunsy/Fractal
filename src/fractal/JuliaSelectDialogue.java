@@ -5,6 +5,7 @@ package fractal;
 
 import LukesBits.Complex;
 import java.awt.Component;
+import java.awt.Window;
 
 /**
  *
@@ -16,7 +17,11 @@ public class JuliaSelectDialogue extends javax.swing.JDialog {
     /**
      * Creates new form NewJDialog
      */
-    public JuliaSelectDialogue(Fractal _fractal, Component parent) {
+    public JuliaSelectDialogue(Fractal _fractal, Window parent) {
+        super(parent);
+        //for an applet using SwingUtilities.windowForComponent(thisPanel) for parent means that the dialogue can't dissapearing behind the browser page!
+        
+        
         //super(parent, modal);
         fractal=_fractal;
         
@@ -60,6 +65,7 @@ public class JuliaSelectDialogue extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Custom Quadratic Julia Set");
         setModal(true);
+        setModalExclusionType(java.awt.Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
         setName("Julia Set Selector");
         setResizable(false);
 

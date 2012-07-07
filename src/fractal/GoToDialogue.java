@@ -7,6 +7,7 @@ import LukesBits.Vector;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.GridLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
@@ -24,7 +25,8 @@ public class GoToDialogue extends JDialog{
     private Fractal fractal;
     private JTextField x,y,zoom;
     
-    public GoToDialogue(Fractal _fractal, Component _parent){
+    public GoToDialogue(Fractal _fractal, Window _parent){
+        super(_parent);
         fractal=_fractal;
         parent=_parent;
         
@@ -75,6 +77,8 @@ public class GoToDialogue extends JDialog{
         
         //show make it act like a normal dialogue: user can't click behind it and it can't dissapear behind the applet/jframe
          setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
+         //for helping with applets
+         setModalExclusionType(java.awt.Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
     }
     
     public void use(){

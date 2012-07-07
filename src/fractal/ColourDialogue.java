@@ -23,7 +23,8 @@ class ColourDialogue extends JDialog{
     private JTextField cycleMultiplierField,cycleOffsetField;
     public final JDialog thisPanel=this;
     
-    public ColourDialogue(FunctionOfZ _fz,Fractal _fractal, Component window){
+    public ColourDialogue(FunctionOfZ _fz,Fractal _fractal, Window window){
+        super(window);
         fz=_fz;
         fractal=_fractal;
         
@@ -75,6 +76,9 @@ class ColourDialogue extends JDialog{
         
         //show make it act like a normal dialogue: user can't click behind it and it can't dissapear behind the applet/jframe
          setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
+         
+         //for helping with applets
+         setModalExclusionType(java.awt.Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
     }
     
     public void open(){

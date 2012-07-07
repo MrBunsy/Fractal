@@ -42,7 +42,7 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
     private JLabel statusLabel;
     private int width,height;
     
-    private final JApplet thisPanel = this;
+    private final JRootPane thisPanel = this.getRootPane();
     
     /**
      * Initialization method that will be called after the applet is loaded into
@@ -166,7 +166,8 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
         loadCustomJulia.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                OldCustomJuliaDialogue d = new OldCustomJuliaDialogue(fractal,thisPanel);
+                
+                JuliaSelectDialogue d = new JuliaSelectDialogue(fractal,SwingUtilities.windowForComponent(thisPanel));
                 d.setVisible(true);
             }
         });
@@ -189,7 +190,7 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
             public void actionPerformed(ActionEvent e) {
                 //fractal.loadSettings(new Vector(0,0,0), 3, 50);
                 //fractal.openColourDialogue();
-                ColourDialogue d = new ColourDialogue(fractal.getFunctionOfZ(),fractal,thisPanel);
+                ColourDialogue d = new ColourDialogue(fractal.getFunctionOfZ(),fractal,SwingUtilities.windowForComponent(thisPanel));
                 d.open();
             }
         });
@@ -211,7 +212,7 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
         goTo.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                GoToDialogue d = new GoToDialogue(fractal, thisPanel);
+                GoToDialogue d = new GoToDialogue(fractal, SwingUtilities.windowForComponent(thisPanel));
                 d.setVisible(true);
             }
         });
