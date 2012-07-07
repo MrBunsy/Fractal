@@ -111,7 +111,7 @@ public class Fractal {
     private FunctionOfZ functionOfZ;
     private ProgressMonitor progressMonitor;
     
-    private int chunkWidth = 100;
+    private int chunkWidth = 50;
 
     public static void printUsage() {
         System.out.println("Usage: "

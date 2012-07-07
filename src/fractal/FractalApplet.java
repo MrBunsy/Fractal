@@ -18,15 +18,14 @@
  */
 package fractal;
 
-import LukesBits.Vector;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 
@@ -268,6 +267,28 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
                         "\n+/- keys or the Control menu can change the detail level.\n Higher detail levels take longer to render."+
                         "\nClick on a point to centre the view around it"
                         , "Help - JavaFractal", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+        
+        JMenuItem website = new JMenuItem("Website");
+        helpMenu.add(website);
+        website.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (Desktop.isDesktopSupported()) {
+                    Desktop desktop = Desktop.getDesktop();
+                    if (desktop.isSupported(Desktop.Action.BROWSE)) {
+                        try {
+                            desktop.browse(new URI("http://www.lukewallin.co.uk/graphics/fractals"));
+                        }
+                        catch(IOException ioe) {
+                            ioe.printStackTrace();
+                        }
+                        catch(URISyntaxException use) {
+                            use.printStackTrace();
+                        }
+                    }
+                }
             }
         });
         

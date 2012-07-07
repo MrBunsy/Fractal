@@ -26,14 +26,14 @@
 package fractal;
 
 import LukesBits.Vector;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
 
@@ -463,6 +463,28 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
             }
         });
         
+        JMenuItem website = new JMenuItem("Website");
+        helpMenu.add(website);
+        website.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (Desktop.isDesktopSupported()) {
+                    Desktop desktop = Desktop.getDesktop();
+                    if (desktop.isSupported(Desktop.Action.BROWSE)) {
+                        try {
+                            desktop.browse(new URI("http://www.lukewallin.co.uk/graphics/fractals"));
+                        }
+                        catch(IOException ioe) {
+                            ioe.printStackTrace();
+                        }
+                        catch(URISyntaxException use) {
+                            use.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
+        
         JMenuItem about = new JMenuItem("About");
         helpMenu.add(about);
         about.addActionListener(new ActionListener() {
@@ -475,6 +497,8 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
                         "\nluke.wallin@gmail.com", "JavaFractal revision 27", JOptionPane.INFORMATION_MESSAGE);
             }
         });
+        
+         
         
         setupExportMenu();
         
