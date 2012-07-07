@@ -318,7 +318,7 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
         loadCustomJulia.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                CustomJuliaDialogue d = new CustomJuliaDialogue(fractal,thisPanel);
+                JuliaSelectDialogue d = new JuliaSelectDialogue(fractal,thisPanel);
                 d.setVisible(true);
             }
         });

@@ -22,10 +22,10 @@ public class JuliaSelectPanel extends JPanel implements IFractalWindow{
     
     private Fractal fractal;
     private int width,height;
-    private CustomJuliaDialogue dialogue;
+    private JuliaSelectDialogue dialogue;
     private Point mouseDown;
     
-    public JuliaSelectPanel(int _width, int _height,CustomJuliaDialogue _dialogue){
+    public JuliaSelectPanel(int _width, int _height,JuliaSelectDialogue _dialogue){
         fractal=new Fractal(_width, _height,_dialogue.getThreads());
         width=_width;
         height=_height;

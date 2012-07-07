@@ -81,6 +81,10 @@ import javax.swing.ProgressMonitor;
  * 
  * 
  * IDEA for animation - julia sets with changing mu :D
+ * 
+ * TODO - work out how the default dialogues can't dissapear behind the applet (and make my custom ones do the same)
+ * modal stuff?
+ * also, fiddle about so that there can't be two of the same dialogue open?
  *
  */
 public class Fractal {

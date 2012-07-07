@@ -5,6 +5,7 @@ package fractal;
 
 import LukesBits.Vector;
 import java.awt.Component;
+import java.awt.Dialog;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -70,6 +71,10 @@ public class GoToDialogue extends JDialog{
         pack();
         setResizable(false);
         setLocationRelativeTo(parent);
+        //setAlwaysOnTop(true);
+        
+        //show make it act like a normal dialogue: user can't click behind it and it can't dissapear behind the applet/jframe
+         setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
     }
     
     public void use(){

@@ -166,7 +166,7 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
         loadCustomJulia.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                CustomJuliaDialogue d = new CustomJuliaDialogue(fractal,thisPanel);
+                OldCustomJuliaDialogue d = new OldCustomJuliaDialogue(fractal,thisPanel);
                 d.setVisible(true);
             }
         });

@@ -13,14 +13,14 @@ import javax.swing.*;
  *
  * @author Luke
  */
-public class CustomJuliaDialogue extends JDialog{
+public class OldCustomJuliaDialogue extends JDialog{
     
     private Fractal fractal;
     private JTextField re,im;
-    private JButton okay,cancel;
+    //private JButton okay,cancel;
     private JuliaSelectPanel p;
     
-    public CustomJuliaDialogue(Fractal _fractal, Component window){
+    public OldCustomJuliaDialogue(Fractal _fractal, Component window){
         fractal=_fractal;
         
         setTitle("Custom Quadratic Julia Set");
@@ -80,7 +80,7 @@ public class CustomJuliaDialogue extends JDialog{
          add(new JLabel("Click the Mandelbrot to select a value for mu:"),c);
          
          
-         p = new JuliaSelectPanel(200, 150, this);
+         //p = new JuliaSelectPanel(200, 150, this);
          
          c.gridx=0;
          c.gridy=4;
@@ -90,29 +90,29 @@ public class CustomJuliaDialogue extends JDialog{
          //c.gridheight=3;
          add(p,c);
          
-         cancel = new JButton("Reset");
+         JButton cancel = new JButton("Cancel");
          cancel.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                p.reset();
+                setVisible(false);
             }
         });
          c.gridx=0;
          c.gridwidth=1;
          c.gridy=5;
          add(cancel,c);
-         
-         cancel = new JButton("Cancel");
-         cancel.addActionListener(new ActionListener() {
+         //I've just switched this buttons around - for soem reason when trying to do it properly the gridbag goes wrong
+         JButton reset = new JButton("Reset");
+         reset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                setVisible(false);
+                p.reset();
             }
         });
          c.gridx=1;
          c.gridy=5;
          c.anchor=GridBagConstraints.LINE_END;
-         add(cancel,c);
+         add(reset,c);
          
-         okay = new JButton("Draw");
+         JButton okay = new JButton("Draw");
          okay.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 fractal.loadCustomJuliaQuadratic(new Complex(Double.parseDouble(re.getText()),Double.parseDouble(im.getText())));
@@ -129,6 +129,11 @@ public class CustomJuliaDialogue extends JDialog{
          
          setResizable(false);
          setLocationRelativeTo(window);
+         
+         //show make it act like a normal dialogue: user can't click behind it and it can't dissapear behind the applet/jframe
+         setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
+         
+         //setAlwaysOnTop(true);
     }
     
     public int getThreads(){

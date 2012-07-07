@@ -4,6 +4,7 @@
 package fractal;
 
 import java.awt.Component;
+import java.awt.Dialog;
 import java.awt.GridLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -68,10 +69,12 @@ class ColourDialogue extends JDialog{
         });
         
         pack();
-        
         setResizable(false);
-        
+        //setAlwaysOnTop(true);
         setLocationRelativeTo(window);
+        
+        //show make it act like a normal dialogue: user can't click behind it and it can't dissapear behind the applet/jframe
+         setModalityType(Dialog.DEFAULT_MODALITY_TYPE);
     }
     
     public void open(){
