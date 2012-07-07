@@ -87,10 +87,14 @@ class ColourDialogue extends JDialog{
     }
     
     private void use(){
-        fz.setCycleMultiplier(Double.parseDouble(cycleMultiplierField.getText()));
-        fz.setCycleOffset(Double.parseDouble(cycleOffsetField.getText()));
-        setVisible(false);
-        fractal.generate();
+        try{
+            fz.setCycleMultiplier(Double.parseDouble(cycleMultiplierField.getText()));
+            fz.setCycleOffset(Double.parseDouble(cycleOffsetField.getText()));
+            setVisible(false);
+            fractal.generate();
+        }catch(NumberFormatException er){
+            JOptionPane.showMessageDialog(rootPane, "Invalid inputs", "Error",JOptionPane.ERROR_MESSAGE);
+        }
     }
     
     private void reset(){

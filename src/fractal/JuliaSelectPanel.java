@@ -30,6 +30,7 @@ public class JuliaSelectPanel extends JPanel implements IFractalWindow{
         width=_width;
         height=_height;
         
+        fractal.setChunkWidth(8);
         fractal.setWindow(this);
         fractal.reset();
         fractal.getFunctionOfZ().setCycleMultiplier(0);
@@ -92,9 +93,13 @@ public class JuliaSelectPanel extends JPanel implements IFractalWindow{
         //stop page from scrolling in applet
         
         double zoom = fractal.getZoom();
-        //good rough detail level for the zoom
+        
+        //good rough detail level for the zoom, so they can just keep zooming in and an extra control for detail level isn't needed
+        
         //int detail = (int)Math.round(100d/Math.sqrt(zoom));
-        int detail = (int)Math.round(100d/Math.pow(zoom,0.3));
+        //int detail = (int)Math.round(100d/Math.pow(zoom,0.3));//speedy but lacks detail at higher zooms
+        //int detail = (int)Math.round(100d/Math.pow(zoom,0.4));//good detail but slower
+        int detail = (int)Math.round(100d/Math.pow(zoom,0.35));//okay compromise
         
         fractal.setDetail(detail);
         

@@ -6,6 +6,7 @@ package fractal;
 import LukesBits.Complex;
 import java.awt.Component;
 import java.awt.Window;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -202,8 +203,13 @@ public class JuliaSelectDialogue extends javax.swing.JDialog {
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void drawButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_drawButtonActionPerformed
+        try{
+        
         fractal.loadCustomJuliaQuadratic(new Complex(Double.parseDouble(re.getText()),Double.parseDouble(im.getText())));
         setVisible(false);
+        }catch(NumberFormatException er){
+                    JOptionPane.showMessageDialog(rootPane, "Invalid inputs", "Error",JOptionPane.ERROR_MESSAGE);
+                }
     }//GEN-LAST:event_drawButtonActionPerformed
 
     /**

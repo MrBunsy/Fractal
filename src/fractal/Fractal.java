@@ -110,6 +110,8 @@ public class Fractal {
     private Thread[] threadClasses;
     private FunctionOfZ functionOfZ;
     private ProgressMonitor progressMonitor;
+    
+    private int chunkWidth = 100;
 
     public static void printUsage() {
         System.out.println("Usage: "
@@ -337,6 +339,10 @@ public class Fractal {
         cancelGeneration = false;
     }
 
+    public void setChunkWidth(int c){
+        chunkWidth=c;
+    }
+    
     //load the standard mandelbrot
     public void loadMandelbrot() {
         functionOfZ = new Mandelbrot(30, true);
@@ -654,6 +660,12 @@ public class Fractal {
     public synchronized void generate() {
 
         if (!generationInProgress) {
+            
+            //test - try blanking the image
+//            Graphics g = bufferImage.getGraphics();
+//            g.setColor(Color.LIGHT_GRAY);
+//            g.fillRect(0, 0, width, height);
+            
             generationInProgress = true;
             needReGenerate = false;
             drawDetail = detail;
@@ -675,14 +687,14 @@ public class Fractal {
                 threadsDrawnTo = 0;
 
                 for (int t = 0; t < threads; t++) {
-                    int drawTo = threadsDrawnTo + 2;
+                    int drawTo = threadsDrawnTo + chunkWidth;
                     if (drawTo > width) {
                         drawTo = width;
                     }
                     fractalThreads[t] = new FractalThread(this, threadsDrawnTo, drawTo, t);
                     threadClasses[t] = new Thread(fractalThreads[t]);
                     threadClasses[t].start();
-                    threadsDrawnTo += 2;
+                    threadsDrawnTo += chunkWidth;
                 }
 
             }else{
@@ -745,7 +757,7 @@ public class Fractal {
 
         } else if (threadsDrawnTo < width) {
             //continue generation
-            int drawTo = threadsDrawnTo + 2;
+            int drawTo = threadsDrawnTo + chunkWidth;
             if (drawTo > width) {
                 drawTo = width;
             }
@@ -753,12 +765,12 @@ public class Fractal {
             fractalThreads[id].newXs(threadsDrawnTo, drawTo);
             threadClasses[id] = new Thread(fractalThreads[id]);
             threadClasses[id].start();
-            threadsDrawnTo++;
+            threadsDrawnTo+=chunkWidth;
         } else {
             //finished!
             finishedThreads++;
         }
-        if (window != null) {
+        if ( window != null) {//id == 0 &&
             //saving a fractal doesn't necessarily mean it had a window - the big version to be AA for example
             window.repaint();
         }
@@ -769,9 +781,10 @@ public class Fractal {
 
         if (finishedThreads >= threads) {
             //all of them finished!
-            if (window != null) {
-                window.repaint();
-            }
+//            if (window != null) {
+//                window.repaint();
+            //this is done above!
+//            }
             generationInProgress = false;
 
             if (saveWhenFinished) {

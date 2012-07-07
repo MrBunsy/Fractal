@@ -10,10 +10,7 @@ import java.awt.GridLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 /**
  *
@@ -21,7 +18,7 @@ import javax.swing.JTextField;
  */
 public class GoToDialogue extends JDialog{
     
-    private Component parent;
+    private Window parent;
     private Fractal fractal;
     private JTextField x,y,zoom;
     
@@ -82,12 +79,18 @@ public class GoToDialogue extends JDialog{
     }
     
     public void use(){
-        setVisible(false);
         
-        FractalSettings s = fractal.exportSettings();
-        s.zoom=Double.parseDouble(zoom.getText());
-        s.centre = new Vector(Double.parseDouble(x.getText()),Double.parseDouble(y.getText()));
         
-        fractal.loadSettings(s);
+        
+        try{
+            FractalSettings s = fractal.exportSettings();
+            s.zoom=Double.parseDouble(zoom.getText());
+            s.centre = new Vector(Double.parseDouble(x.getText()),Double.parseDouble(y.getText()));
+            fractal.loadSettings(s);
+            setVisible(false);
+        }catch(NumberFormatException e){
+            JOptionPane.showMessageDialog(rootPane, "Invalid inputs", "Error",JOptionPane.ERROR_MESSAGE);
+        }
+        
     }
 }
