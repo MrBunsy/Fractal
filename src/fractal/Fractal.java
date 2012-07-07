@@ -832,14 +832,25 @@ public class Fractal {
         Fractal f = new Fractal(width * scaleUp, height * scaleUp, threads, functionOfZ, detail, zoom, centre, filename, _aa, pm);
         //f.setProgressMonitor(progressMonitor);
         f.setUpscale(scaleDown);
+        f.setChunkWidth(1);
     }
     
     public void saveCertainRez(String filename, int w, int h, int aaLevel, ProgressMonitor pm){
         Fractal f = new Fractal(w*aaLevel, h*aaLevel, threads, functionOfZ, detail, zoom, centre, filename, aaLevel > 1, pm);
         //f.setProgressMonitor(progressMonitor);
         f.setUpscale(aaLevel);
+        f.setChunkWidth(1);
     }
 
+    public void saveInfo(String filename) throws IOException{
+        //store a text file too
+        FileWriter fstream = new FileWriter(filename + ".txt");
+        BufferedWriter out = new BufferedWriter(fstream);
+        out.write(infoString(true));
+        //Close the output stream
+        out.close();
+    }
+    
     public void save(String filename, boolean aa, boolean info) {
         try {
 
@@ -869,12 +880,7 @@ public class Fractal {
             }
 
             if (info) {
-                //store a text file too
-                FileWriter fstream = new FileWriter(filename + ".txt");
-                BufferedWriter out = new BufferedWriter(fstream);
-                out.write(infoString(true));
-                //Close the output stream
-                out.close();
+                saveInfo(filename);
             }
 
         } catch (IOException ex) {

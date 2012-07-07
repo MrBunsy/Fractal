@@ -529,18 +529,28 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
             }
         });
         
-        JMenuItem hugeExport = new JMenuItem((width*16)+"x"+(height*16));
-        exportMenu.add(hugeExport);
-        hugeExport.addActionListener(new ActionListener() {
+        JMenuItem customExport = new JMenuItem("Custom");
+        exportMenu.add(customExport);
+        customExport.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                
-                String filename = fractal.getFileName()+"_huge";
-                progressMonitor = new ProgressMonitor(thisPanel, "Exporting to "+filename+".png", null, 0, width+1);
-                progressMonitor.setMillisToDecideToPopup(0);
-                fractal.saveBig(filename, 16, false,progressMonitor);
+                CustomExport d = new CustomExport(fractal,thisPanel);
+                d.setVisible(true);
             }
         });
+        
+//        JMenuItem hugeExport = new JMenuItem((width*16)+"x"+(height*16));
+//        exportMenu.add(hugeExport);
+//        hugeExport.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                
+//                String filename = fractal.getFileName()+"_huge";
+//                progressMonitor = new ProgressMonitor(thisPanel, "Exporting to "+filename+".png", null, 0, width+1);
+//                progressMonitor.setMillisToDecideToPopup(0);
+//                fractal.saveBig(filename, 16, false,progressMonitor);
+//            }
+//        });
         
         JMenuItem aa4Export = new JMenuItem("4xAA - "+(width)+"x"+(height));
         exportMenu.add(aa4Export);
@@ -548,23 +558,36 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
             @Override
             public void actionPerformed(ActionEvent e) {
                 
-                String filename = fractal.getFileName()+"_4aa";
+                String filename = fractal.getFileName()+(width)+"x"+(height)+"_4aa";
                 progressMonitor = new ProgressMonitor(thisPanel, "Exporting to "+filename+".png", null, 0, width+1);
                 progressMonitor.setMillisToDecideToPopup(0);
                 fractal.saveBig(filename, 4, true,progressMonitor);
             }
         });
         
-        JMenuItem bigaa4Export = new JMenuItem("4xAA - "+(width*2)+"x"+(height*2));
-        exportMenu.add(bigaa4Export);
-        bigaa4Export.addActionListener(new ActionListener() {
+//        JMenuItem bigaa4Export = new JMenuItem("4xAA - "+(width*2)+"x"+(height*2));
+//        exportMenu.add(bigaa4Export);
+//        bigaa4Export.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                
+//                String filename = fractal.getFileName()+"_4aa";
+//                progressMonitor = new ProgressMonitor(thisPanel, "Exporting to "+filename+".png", null, 0, width+1);
+//                progressMonitor.setMillisToDecideToPopup(0);
+//                fractal.saveBig(filename, 8,4, true,progressMonitor);
+//            }
+//        });
+        
+        JMenuItem myRezaa4Export = new JMenuItem("4xAA - 1680x1050");
+        exportMenu.add(myRezaa4Export);
+        myRezaa4Export.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 
-                String filename = fractal.getFileName()+"_4aa";
+                String filename = fractal.getFileName()+"_1680x1050_4aa";
                 progressMonitor = new ProgressMonitor(thisPanel, "Exporting to "+filename+".png", null, 0, width+1);
                 progressMonitor.setMillisToDecideToPopup(0);
-                fractal.saveBig(filename, 8,4, true,progressMonitor);
+                fractal.saveCertainRez(filename, 1680, 1050, 4, progressMonitor);
             }
         });
         
@@ -581,72 +604,61 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
             }
         });
         
-        JMenuItem myRezaa4Export = new JMenuItem("4xAA - 1680x1050");
-        exportMenu.add(myRezaa4Export);
-        myRezaa4Export.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                
-                String filename = fractal.getFileName()+"_1680x1050_4aa";
-                progressMonitor = new ProgressMonitor(thisPanel, "Exporting to "+filename+".png", null, 0, width+1);
-                progressMonitor.setMillisToDecideToPopup(0);
-                fractal.saveCertainRez(filename, 1680, 1050, 4, progressMonitor);
-            }
-        });
         
-        JMenuItem aa8Export = new JMenuItem("8xAA - "+(width)+"x"+(height));
-        exportMenu.add(aa8Export);
-        aa8Export.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                
-                String filename = fractal.getFileName()+"_8aa";
-                progressMonitor = new ProgressMonitor(thisPanel, "Exporting to "+filename+".png", null, 0, width+1);
-                progressMonitor.setMillisToDecideToPopup(0);
-                fractal.saveBig(filename, 8, true,progressMonitor);
-            }
-        });
-        
-        
-        
-        JMenuItem bigaa8Export = new JMenuItem("8xAA - "+(width*2)+"x"+(height*2));
-        exportMenu.add(bigaa8Export);
-        bigaa8Export.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                
-                String filename = fractal.getFileName()+"_8aa";
-                progressMonitor = new ProgressMonitor(thisPanel, "Exporting to "+filename+".png", null, 0, width+1);
-                progressMonitor.setMillisToDecideToPopup(0);
-                fractal.saveBig(filename, 16,8, true,progressMonitor);
-            }
-        });
-        
-        JMenuItem hdaa8Export = new JMenuItem("8xAA - 1920x1080 (HD)");
-        exportMenu.add(hdaa8Export);
-        hdaa8Export.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                
-                String filename = fractal.getFileName()+"_hd_8aa";
-                progressMonitor = new ProgressMonitor(thisPanel, "Exporting to "+filename+".png", null, 0, width+1);
-                progressMonitor.setMillisToDecideToPopup(0);
-                fractal.saveCertainRez(filename, 1920, 1080, 8, progressMonitor);
-            }
-        });
-        
-        JMenuItem myRezaa8Export = new JMenuItem("8xAA - 1680x1050");
-        exportMenu.add(myRezaa8Export);
-        myRezaa8Export.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                
-                String filename = fractal.getFileName()+"_1680x1050_8aa";
-                progressMonitor = new ProgressMonitor(thisPanel, "Exporting to "+filename+".png", null, 0, width+1);
-                progressMonitor.setMillisToDecideToPopup(0);
-                fractal.saveCertainRez(filename, 1680, 1050, 8, progressMonitor);
-            }
-        });
+//        
+//        JMenuItem aa8Export = new JMenuItem("8xAA - "+(width)+"x"+(height));
+//        exportMenu.add(aa8Export);
+//        aa8Export.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                
+//                String filename = fractal.getFileName()+"_8aa";
+//                progressMonitor = new ProgressMonitor(thisPanel, "Exporting to "+filename+".png", null, 0, width+1);
+//                progressMonitor.setMillisToDecideToPopup(0);
+//                fractal.saveBig(filename, 8, true,progressMonitor);
+//            }
+//        });
+//        
+//        
+//        
+//        JMenuItem bigaa8Export = new JMenuItem("8xAA - "+(width*2)+"x"+(height*2));
+//        exportMenu.add(bigaa8Export);
+//        bigaa8Export.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                
+//                String filename = fractal.getFileName()+"_8aa";
+//                progressMonitor = new ProgressMonitor(thisPanel, "Exporting to "+filename+".png", null, 0, width+1);
+//                progressMonitor.setMillisToDecideToPopup(0);
+//                fractal.saveBig(filename, 16,8, true,progressMonitor);
+//            }
+//        });
+//        
+//        JMenuItem hdaa8Export = new JMenuItem("8xAA - 1920x1080 (HD)");
+//        exportMenu.add(hdaa8Export);
+//        hdaa8Export.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                
+//                String filename = fractal.getFileName()+"_hd_8aa";
+//                progressMonitor = new ProgressMonitor(thisPanel, "Exporting to "+filename+".png", null, 0, width+1);
+//                progressMonitor.setMillisToDecideToPopup(0);
+//                fractal.saveCertainRez(filename, 1920, 1080, 8, progressMonitor);
+//            }
+//        });
+//        
+//        JMenuItem myRezaa8Export = new JMenuItem("8xAA - 1680x1050");
+//        exportMenu.add(myRezaa8Export);
+//        myRezaa8Export.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                
+//                String filename = fractal.getFileName()+"_1680x1050_8aa";
+//                progressMonitor = new ProgressMonitor(thisPanel, "Exporting to "+filename+".png", null, 0, width+1);
+//                progressMonitor.setMillisToDecideToPopup(0);
+//                fractal.saveCertainRez(filename, 1680, 1050, 8, progressMonitor);
+//            }
+//        });
         
         
     }
