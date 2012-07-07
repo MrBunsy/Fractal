@@ -1,3 +1,9 @@
 idea: have a ability to save from the applet version with a link to a page on the website which loads the stuff from parameters
 
+expanded idea: export info with a pop up text area (json?) and have an import on the frame version
+and/or use data uri to export the image to the browser
+http://stackoverflow.com/questions/4838464/convert-byte-to-base64-string-for-data-uri
+http://stackoverflow.com/questions/6377608/in-java-is-it-possible-to-convert-a-bufferedimage-to-an-img-data-uri
+
 custom export window: size of image and level of AA
+-done :D

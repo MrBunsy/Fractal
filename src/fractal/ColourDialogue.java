@@ -30,8 +30,15 @@ class ColourDialogue extends JDialog{
         
         setTitle("Colour Settings");
         
+        GridLayout g = new GridLayout(3,3,10,10);
+        
+        //add space around the edge of the window
+        //http://www.velocityreviews.com/forums/t135834-gridlayout-does-not-leave-room-between-edge-of-window-and-objects.html
+        JPanel panel = (JPanel) getContentPane();
+        panel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        
         //rows, cols, spacing
-        setLayout(new GridLayout(3,3,10,10));
+        setLayout(g);
         
         add(new JLabel("Cycle Multiplier:"));
         cycleMultiplierField=new JTextField(fz.getCycleMultiplier()+"");        

@@ -851,7 +851,11 @@ public class Fractal {
         out.close();
     }
     
-    public void save(String filename, boolean aa, boolean info) {
+    public void save(String filename, boolean aa, boolean info){
+        save(filename, aa, info, false);
+    }
+    
+    public void save(String filename, boolean aa, boolean info, boolean applet) {
         try {
 
             if (aa) {
@@ -864,7 +868,11 @@ public class Fractal {
                     progressMonitor.setNote("Saving Image");
                     progressMonitor.setProgress(width + 1);
                 }
-                ImageIO.write(aaImage, "png", new File(filename + ".png"));
+                if(!applet){
+                    ImageIO.write(aaImage, "png", new File(filename + ".png"));
+                }else{
+                    
+                }
                 if (progressMonitor != null) {
                     progressMonitor.setProgress(width + 2);
                 }

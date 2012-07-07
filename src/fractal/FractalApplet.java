@@ -275,6 +275,9 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
         website.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                
+                //doesn't seem to work in chrome?
+                //*sometimes* doesn't work in chrome
                 if (Desktop.isDesktopSupported()) {
                     Desktop desktop = Desktop.getDesktop();
                     if (desktop.isSupported(Desktop.Action.BROWSE)) {

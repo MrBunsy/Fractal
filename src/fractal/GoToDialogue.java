@@ -29,7 +29,12 @@ public class GoToDialogue extends JDialog{
         
         setTitle("Viewport Settings");
         
-        setLayout(new GridLayout(5, 2, 5, 5));
+        //add space around the edge of the window
+        //http://www.velocityreviews.com/forums/t135834-gridlayout-does-not-leave-room-between-edge-of-window-and-objects.html
+        JPanel panel = (JPanel) getContentPane();
+        panel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
+        
+        setLayout(new GridLayout(5, 2, 10, 5));
         
         JLabel centreText = new JLabel("Centre = ");
         add(centreText);

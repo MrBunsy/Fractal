@@ -180,12 +180,12 @@ public class JuliaSelectDialogue extends javax.swing.JDialog {
                 .addComponent(JuliaPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel2)
-                .addGap(13, 13, 13)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cancelButton)
                     .addComponent(resetButton)
                     .addComponent(drawButton))
-                .addGap(20, 20, 20))
+                .addContainerGap())
         );
 
         JuliaPanel.getAccessibleContext().setAccessibleName("");
