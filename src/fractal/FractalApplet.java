@@ -302,7 +302,7 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
             public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(thisPanel, 
                         "JavaFractal is Copyright (c) Luke Wallin 2012"+
-                        "\nReleased under LPGL"+
+                        "\nReleased under LGPL"+
                         "\nwww.lukewallin.co.uk/graphics/fractals"+
                         "\nluke.wallin@gmail.com", "JavaFractal revision 27", JOptionPane.INFORMATION_MESSAGE);
             }

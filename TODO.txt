@@ -7,3 +7,6 @@ http://stackoverflow.com/questions/6377608/in-java-is-it-possible-to-convert-a-b
 
 custom export window: size of image and level of AA
 -done :D
+
+
+idea from paul: when zooming in, show a resized version of the current image before re-rendering it

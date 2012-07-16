@@ -353,6 +353,11 @@ public class Fractal {
 //        }
     }
     
+    public void loadCustomFunction(){
+        functionOfZ = new CustomFunction2();
+        reset();
+    }
+    
     public void loadMandelbrot(double k){
         functionOfZ = new Mandelbrot(k);
         reset();

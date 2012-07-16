@@ -14,7 +14,7 @@ import java.awt.Color;
  */
 public class Julia implements FunctionOfZ{
 
-    private Complex mu;
+    protected Complex mu;
     private ColourType colour;
     
     protected double cycleMultiplier;

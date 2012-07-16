@@ -289,6 +289,15 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
 //                fractal.loadMandelbrot(8);
 //            }
 //        });
+//        
+//        JMenuItem loadCustom = new JMenuItem("Test");
+//        fractalMenu.add(loadCustom);
+//        loadCustom.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                fractal.loadCustomFunction();
+//            }
+//        });
         
         JMenuItem loadShip = new JMenuItem("Burning Ship");
         fractalMenu.add(loadShip);
@@ -492,7 +501,7 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
             public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(thisPanel, 
                         "JavaFractal is Copyright (c) Luke Wallin 2012"+
-                        "\nReleased under LPGL"+
+                        "\nReleased under LGPL"+
                         "\nwww.lukewallin.co.uk/graphics/fractals"+
                         "\nluke.wallin@gmail.com", "JavaFractal revision 27", JOptionPane.INFORMATION_MESSAGE);
             }
