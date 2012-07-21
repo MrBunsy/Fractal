@@ -386,7 +386,7 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
         zoomIn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                fractal.scroll(-1);
+                fractal.scrollNoMouse(-1);
             }
         });
         
@@ -395,7 +395,7 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
         zoomOut.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                fractal.scroll(1);
+                fractal.scrollNoMouse(1);
             }
         });
         

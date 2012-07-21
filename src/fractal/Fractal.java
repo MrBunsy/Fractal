@@ -569,8 +569,17 @@ public class Fractal {
         }
     }
 
-    public void scroll(int scroll) {
-        Point m = window.getMousePosition(true);
+    //scroll in, by default taking into account the mouse position
+    public void scroll(int scroll){
+        scroll(scroll,window.getMousePosition(true));
+    }
+    
+    public void scrollNoMouse(int scroll){
+        scroll(scroll, new Point(width/2,height/2));
+    }
+    
+    public void scroll(int scroll, Point m) {
+        //Point m = window.getMousePosition(true);
 
 
         if (m != null) {
@@ -587,10 +596,71 @@ public class Fractal {
             //offset = mouseComplex - mouseScreen*newZoomAdjust
             //could do this to revolve around centre, not offset, but this was easier to think about
 
+            
+            
+            double oldZoom = zoom;
+            double oldAdjustedZoom = adjustedZoom;
+            
+            Vector oldCentre = centre;
+            
+            
+            
             updateZoom(scroll);
-
             
             centre = mouseComplex.subtract(new Vector((double)(m.x - width/2),(double)(height/2-m.y)).multiply(adjustedZoom));
+            
+            
+            //Complex newCentreOnOldView = pixelToComplex(centre.getRoundedX(), centre.getRoundedY(),oldAdjustedZoom,oldCentre);
+            //less than one if zooming in
+            //TODO use zoom adjust?
+            double ratio = zoom/oldZoom;
+            
+            
+
+            
+            
+            if(ratio<1){
+                //zooming in - easy, since only taking a chunk of the image
+                
+                
+                double sampleWidth = width*ratio;
+                double sampleHeight = height*ratio;
+                
+                //need - NEW centre on OLD image
+                Vector newCentrePixels = complexToPixel(centre,oldAdjustedZoom,oldCentre);
+                
+                BufferedImage zoomImage = bufferImage.getSubimage((int)Math.round(newCentrePixels.x-sampleWidth/2), (int)Math.round(newCentrePixels.y-sampleHeight/2), (int)Math.round(sampleWidth), (int)Math.round(sampleHeight));
+                
+                bufferImage = Image.getScaledInstance(zoomImage, width, height, RenderingHints.VALUE_INTERPOLATION_BILINEAR, false);
+                
+            }else{
+                //zooming out
+                
+                //what to shrink the old image to
+                double newHeight = height/ratio;
+                double newWidth = width/ratio;
+                
+                //where to put this
+                
+                //need the OLD centre on the NEW image
+                Vector oldCentrePixels = complexToPixel(oldCentre, adjustedZoom, centre);
+                
+                BufferedImage zoomImage = Image.getScaledInstance(bufferImage, (int)Math.round(newWidth), (int)Math.round(newHeight), RenderingHints.VALUE_INTERPOLATION_BICUBIC, false);
+                
+                Graphics g = bufferImage.getGraphics();
+                
+                //fill in image with grey
+                g.setColor(Color.DARK_GRAY);
+                g.fillRect(0, 0, width, height);
+                
+                //playing around suggests that flooring this and ceiling zooming in looks best - less 'moving' as the image is drawn over in detail.
+                //playing around with different sized windows suggests otherwise :/
+                //sticking with plain round for now
+                g.drawImage(zoomImage, (int)Math.round(oldCentrePixels.x-newWidth/2), (int)Math.round(oldCentrePixels.y-newHeight/2), null);
+            }
+
+            
+            
             
             //.add(new Vector(0,1),_zoom*(double)(width-height)/(2.0*(double)width)) is a bodge to get it to work when the aspect ratio isn't 1
             //I'm not entirely sure what's happenning, but it works!
@@ -625,12 +695,23 @@ public class Fractal {
 //        return offset;
 //    }
 
+    public Vector complexToPixel(Vector c,double _adjustedZoom, Vector centre){
+        Vector intermediate = c.subtract(centre);//.toVector()
+        intermediate = intermediate.multiply(1d/_adjustedZoom);
+        
+        return new Vector((double)width*0.5 + intermediate.x,(double)height*0.5 - intermediate.y);
+    }
+    
     public Complex pixelToComplex(int x, int y){
          //double adjustedZoom = drawZoom / (double)Math.min(width,height);
-         return pixelToComplex(x, y, adjustedZoom);
+         return pixelToComplex(x, y, adjustedZoom,centre);
     }
     
     private Complex pixelToComplex(int x, int y, double _adjustedZoom){
+        return pixelToComplex(x, y, _adjustedZoom, centre);
+    }
+    
+    private Complex pixelToComplex(int x, int y, double _adjustedZoom, Vector centre){
         Vector diff = new Vector((double)(x - width/2),(double)(height/2-y));
         
         diff = diff.multiply(_adjustedZoom);

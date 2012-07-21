@@ -221,7 +221,7 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
         zoomIn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                fractal.scroll(-1);
+                fractal.scrollNoMouse(-1);
             }
         });
         
@@ -230,7 +230,7 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
         zoomOut.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                fractal.scroll(1);
+                fractal.scrollNoMouse(1);
             }
         });
         
