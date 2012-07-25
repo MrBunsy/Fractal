@@ -304,7 +304,7 @@ public class FractalApplet extends JApplet implements IFractalWindow,KeyListener
                         "JavaFractal is Copyright (c) Luke Wallin 2012"+
                         "\nReleased under LGPL"+
                         "\nwww.lukewallin.co.uk/graphics/fractals"+
-                        "\nluke.wallin@gmail.com", "JavaFractal revision 27", JOptionPane.INFORMATION_MESSAGE);
+                        "\nluke.wallin@gmail.com", "JavaFractal revision 56", JOptionPane.INFORMATION_MESSAGE);
             }
         });
         

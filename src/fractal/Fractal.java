@@ -111,7 +111,7 @@ public class Fractal {
     private FunctionOfZ functionOfZ;
     private ProgressMonitor progressMonitor;
     
-    private int chunkWidth = 50;
+    private int chunkWidth = 10;
 
     public static void printUsage() {
         System.out.println("Usage: "
@@ -645,7 +645,7 @@ public class Fractal {
                 //need the OLD centre on the NEW image
                 Vector oldCentrePixels = complexToPixel(oldCentre, adjustedZoom, centre);
                 
-                BufferedImage zoomImage = Image.getScaledInstance(bufferImage, (int)Math.round(newWidth), (int)Math.round(newHeight), RenderingHints.VALUE_INTERPOLATION_BICUBIC, false);
+                BufferedImage zoomImage = Image.getScaledInstance(bufferImage, (int)Math.round(newWidth), (int)Math.round(newHeight), RenderingHints.VALUE_INTERPOLATION_BILINEAR, false);
                 
                 Graphics g = bufferImage.getGraphics();
                 
