@@ -52,7 +52,10 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
     //private JMenuBar menuBar;
     //private JMenu fractalMenu,colourMenu,exportMenu;
     //private JMenuItem fractalMenu_mandelbrot,fractalMenu_julia,fractalMenu_customMandelbrot,fractalMenu_customJulia;
+    //the label with the text
     private JLabel statusLabel;
+    //the panel that status resides inside
+    private JPanel statusPanel;
     //private Dimension oldDims;
     
     private int width,height;
@@ -65,63 +68,34 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
     private JMenuBar menuBar;
     
     private final FractalWindow thisPanel = this;
+    private boolean fullscreen;
     
-    public FractalWindow(Fractal _fractal, int _width, int _height){
+    public FractalWindow(Fractal _fractal, int _width, int _height, boolean _fullscreen){
         panel = new FractalPanel(_fractal, _width, _height);
         fractal=_fractal;
         
         width=_width;
         height=_height;
         
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        fullscreen=_fullscreen;
         
-        //setResizable(false);
-        
-        
-        
-        
-        setupMenus();
-        
-        //height+=menuBar.getHeight();
-        
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         add(panel);
-        //getContentPane().add(panel);
         
+        //set an initial size for the panel
+        setPanelSize();
         
-//        //http://stackoverflow.com/questions/3035880/how-can-i-create-a-bar-in-the-bottom-of-a-java-app-like-a-status-bar
-//        // create the status bar panel and shove it down the bottom of the frame
-//        JPanel statusPanel = new JPanel();
-//        statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
-//        add(statusPanel, BorderLayout.SOUTH);
-//        statusPanel.setPreferredSize(new Dimension(width, 20));
-//        statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
-//        statusLabel = new JLabel("status");
-//        statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
-//        statusPanel.add(statusLabel);
-        addStatusPanel();
-        //to make up for the status bar at the bottom
-        //height+=20;
-        //height+=getHeight();
+        //both of these will call pack();
+        if(fullscreen){
+            setupFullscreen();
+        }else{
+            setupWindow();
+        }
         
-        //setupProgressPanel();
-        //setupProgressDialogue();
-        
-//        Dialog d = new Dialog(this);
-//        d.setVisible(true);
-        
-        //content pane has prefered size
-        getContentPane().setPreferredSize(new java.awt.Dimension(width, height));
-        //so when pack is called, everything else fits around it :D
-        pack();
-        //setSize(new java.awt.Dimension(width, height));
-        setVisible(true);
-        
-        
-        //do this last
-        Dimension d = getSize();
-        xPadding=d.width-width;
-        yPadding=d.height-height;
-        //progMon.setProgress(2);
+        //now the real window size will be a little different and we can owrk out
+        //the padding that the menus added
+        //bit of a bodge, but it works
+        calculatePadding();
         
         addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
@@ -136,6 +110,76 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
         }});
     }
     
+    private void setPanelSize(){
+        //content pane has prefered size
+        getContentPane().setPreferredSize(new java.awt.Dimension(width, height));
+    }
+    
+    private void calculatePadding(){
+        //do this last
+        Dimension d = getSize();
+        xPadding=d.width-width;
+        yPadding=d.height-height;
+    }
+    
+    private void setupFullscreen(){
+        
+        
+        setUndecorated(true);
+        setResizable(false);
+        validate();
+        pack();
+        
+        GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(this);            
+        beenResized(null);
+    }
+    
+    private void setupWindow(){
+        setupMenus();
+        addStatusPanel();
+        //so when pack is called, everything else fits around it :D
+        pack();
+        setVisible(true);
+    }
+    
+    private void toggleFullscreen(){
+        if(fullscreen){
+            //go back to window
+            GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(null);
+            dispose();
+            setUndecorated(false);
+            
+            
+            
+            //todo put this code and code in constructor in smae place
+            width=800;
+            height=640;
+            setupWindow();
+            calculatePadding();
+            
+            fullscreen=false;
+        }else{
+            dispose();
+            
+            //remove(menuBar);
+            setJMenuBar(null);
+            remove(statusPanel);
+            
+            
+            xPadding=0;
+            yPadding=0;
+            
+            //add(panel);
+            setupFullscreen();
+            
+            
+            
+            fullscreen=true;
+        }
+        
+        
+    }
+    
     private void beenResized(ComponentEvent e){
         
         Dimension d = getSize();
@@ -143,8 +187,8 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
         int w=d.width-xPadding;
         int h = d.height-yPadding;
 
-        if(w!=width || h!=height){
-            //only resize if an actual change occured
+        if(w!=width || h!=height){// || e==null){
+            //only resize if an actual change occured or called manually
             resizeFractal(w,h);
         }
 
@@ -171,9 +215,11 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
 
         fractal.loadSettings(s);
         panel.setFractal(fractal);
-        menuBar.remove(exportMenu);
-        setupExportMenu();
-        menuBar.add(exportMenu, 4);
+        if(!fullscreen){
+            menuBar.remove(exportMenu);
+            setupExportMenu();
+            menuBar.add(exportMenu, 4);
+        }
     }
     
     @Override
@@ -226,7 +272,7 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
     private void addStatusPanel(){
         //http://stackoverflow.com/questions/3035880/how-can-i-create-a-bar-in-the-bottom-of-a-java-app-like-a-status-bar
         // create the status bar panel and shove it down the bottom of the frame
-        JPanel statusPanel = new JPanel();
+        statusPanel = new JPanel();
         statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
         
         //getLayeredPane().add(statusPanel,new Integer(300));
@@ -333,6 +379,15 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
             public void actionPerformed(ActionEvent e) {
                 JuliaSelectDialogue d = new JuliaSelectDialogue(fractal,thisPanel);
                 d.setVisible(true);
+            }
+        });
+        
+        JMenuItem quit = new JMenuItem("Exit");
+        fractalMenu.add(quit);
+        quit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                shutdown();
             }
         });
         
@@ -674,16 +729,36 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
     
     public void paint(Graphics g){
         super.paint(g);
-        if(fractal.ready()){
-            statusLabel.setText(fractal.statusText());
-        }else{
-            statusLabel.setText("Generating...");
+        if(!fullscreen){
+            if(fractal.ready()){
+                statusLabel.setText(fractal.statusText());
+            }else{
+                statusLabel.setText("Generating...");
+            }
         }
+    }
+    
+    private void shutdown(){
+        dispose();
+        System.exit(0);
     }
     
     private void key(java.awt.event.KeyEvent evt) {
         int key = evt.getKeyCode();
-        fractal.key(key);
+        switch(key){
+            //something purely for the window?
+            case java.awt.event.KeyEvent.VK_F11:
+                //toggle fullscreen
+                toggleFullscreen();
+                break;
+            case java.awt.event.KeyEvent.VK_ESCAPE:
+                shutdown();
+                break;
+            default:
+                fractal.key(key);
+                break;
+        }
+        
     }
     
 //    @Override

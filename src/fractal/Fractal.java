@@ -22,10 +22,7 @@ import LukesBits.Complex;
 import LukesBits.Image;
 import LukesBits.Vector;
 import jargs.gnu.CmdLineParser;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Point;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -34,7 +31,10 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.swing.JLabel;
 import javax.swing.ProgressMonitor;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 
 /**
  *
@@ -218,8 +218,17 @@ public class Fractal {
 
             //f.setCycleMultiplier(50);
             f.setUpscale(upscale);
-            FractalWindow w = new FractalWindow(f, width, height);
+            FractalWindow w = new FractalWindow(f, width, height,true);
             f.setWindow(w);
+            
+//            w.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+//            w.setUndecorated(true);
+//            w.setResizable(false);
+//            //w.add(new JLabel("Press ALT+F4 to exit fullscreen.", SwingConstants.CENTER), BorderLayout.CENTER);
+//            w.validate();
+//
+//            GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(w);
+            
             //f.setBackground(new Colour(255,255,255));
         }
     }
