@@ -242,7 +242,7 @@ public class Mandelbrot implements FunctionOfZ{
 
     @Override
     public int defaultDetail() {
-        return 50;
+        return 100;
     }
 
     @Override

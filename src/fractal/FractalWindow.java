@@ -146,22 +146,33 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
         if(fullscreen){
             //go back to window
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(null);
+            //calling dispose means the window can't be displayed, so undecorated can be altered
             dispose();
             setUndecorated(false);
-            
+            setResizable(true);
             
             
             //todo put this code and code in constructor in smae place
-            width=800;
-            height=640;
+//            width=800;
+//            height=640;
+//            xPadding=0;
+//            yPadding=0;
+            resizeWindow(800, 640);
+            
             setupWindow();
+            
+            
             calculatePadding();
+            
+            //beenResized(null);
+            
             
             fullscreen=false;
         }else{
+            
             dispose();
             
-            //remove(menuBar);
+            //remove the menu bar and status bar
             setJMenuBar(null);
             remove(statusPanel);
             
@@ -187,7 +198,7 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
         int w=d.width-xPadding;
         int h = d.height-yPadding;
 
-        if(w!=width || h!=height){// || e==null){
+        if(w!=width || h!=height || e==null){
             //only resize if an actual change occured or called manually
             resizeFractal(w,h);
         }
@@ -472,6 +483,16 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
             }
         });
         // ------------------- Window Menu -------------------
+        
+        
+        JMenuItem goFullscreen = new JMenuItem("Toggle Fullscreen (F11)");
+        windowMenu.add(goFullscreen);
+        goFullscreen.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                toggleFullscreen();
+            }
+        });
         
         JMenuItem resize600 = new JMenuItem("600x600 (1:1)");
         windowMenu.add(resize600);
