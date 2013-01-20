@@ -30,12 +30,17 @@ public class Mandelbrot implements FunctionOfZ{
     public Vector defaultCentre = new Vector(-0.5, 0);
     
     protected double k;
+    protected boolean kIsPowerOf2,kIsInt;
     
     public Mandelbrot(boolean _smoothColour){
         k=2;
         smoothColour=_smoothColour;
         cycleOffset=defaultCycleOffset;
         cycleMultiplier=defaultCycleMultiplier;
+        
+        //true if k is an int and power of 2
+        kIsPowerOf2 = k%1d == 0  && isPowerOf2((int)k);
+        kIsInt = k%1d == 0;
     }
     
     public Mandelbrot(double _k){
@@ -51,6 +56,10 @@ public class Mandelbrot implements FunctionOfZ{
         smoothColour=true;
         
         k=_k;
+        
+        //true if k is an int and power of 2
+        kIsPowerOf2 = k%1d == 0  && isPowerOf2((int)k);
+        kIsInt = k%1d == 0;
     }
     
     public Mandelbrot(double _cycleMultiplier,boolean _smoothColour){//, Fractal _fractal){
@@ -95,9 +104,9 @@ public class Mandelbrot implements FunctionOfZ{
         
         Complex oldZ=z;
         
-        if(k%1d == 0 ){
+        if(kIsInt){//k%1d == 0 
             //whole number
-            if(isPowerOf2((int)k)){
+            if(kIsPowerOf2){//isPowerOf2((int)k)
                 //power of 2!
                 //keep squaring z
                 //changing base http://en.wikipedia.org/wiki/Logarithm#Change_of_base
@@ -119,19 +128,6 @@ public class Mandelbrot implements FunctionOfZ{
             z = z.power(k);
         }
         
-//        switch((int)k){
-//            case 8:
-//                z=z.times(z);
-//            case 4:
-//                z=z.times(z);
-//            case 2:
-//                z=z.times(z);
-//                break;
-//            default:
-//                //this is VERY slow
-//                z = z.power(k);
-//                break;
-//        }
         return z.plus(c);
     }
     
@@ -171,7 +167,7 @@ public class Mandelbrot implements FunctionOfZ{
     @Override
     public Color getColourFor(Complex z, Complex c, int detail) {
         int i=0;
-        double s=0;
+        //double s=0;
         
         //Complex oldZ=z;
         
@@ -187,11 +183,17 @@ public class Mandelbrot implements FunctionOfZ{
 //            }
         }
         
+        return colourLogic(i, detail, k, z, c);
+       // }
+    }
+    
+    public Color colourLogic(int i, int detail,double s,Complex z, Complex c){
         
         if(i==detail){
             //escaped
             return new Color(0,0,0);
         }else if(cycleMultiplier==0){
+            //working in black and white
             return new Color(255,255,255);
         }
         
@@ -223,7 +225,6 @@ public class Mandelbrot implements FunctionOfZ{
             double colour =  (s + cycleOffset*cycleSize) % cycleSize / cycleSize;
             //return Colour.hsvToRgb(colour, 0.8, 1.0);
             return Color.getHSBColor((float)colour, 0.8f, 1.0f);
-       // }
     }
     
     public String toString(){

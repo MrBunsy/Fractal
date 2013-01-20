@@ -117,7 +117,8 @@ public class Fractal {
         System.out.println("Usage: "
                 + "-w --width Image width (pixels)\n"
                 + "-h --height Image height (pixels)\n"
-                + "-t --threads Number of threads\n");
+                + "-t --threads Number of threads"
+                + "-f --fullscreen Start in fullscreen mode\n");
     }
 
     /**
@@ -132,6 +133,7 @@ public class Fractal {
         CmdLineParser.Option threadsArg = parser.addIntegerOption('t', "threads");
         CmdLineParser.Option upScaleArg = parser.addIntegerOption('u', "upscale");
         CmdLineParser.Option animationArg = parser.addBooleanOption('a', "animation");
+        CmdLineParser.Option fullscreenArg = parser.addBooleanOption('f', "fullscreen");
 
         try {
             parser.parse(args);
@@ -145,6 +147,7 @@ public class Fractal {
         int threads = (Integer) parser.getOptionValue(threadsArg, Runtime.getRuntime().availableProcessors());
         int upscale = (Integer) parser.getOptionValue(upScaleArg, 4);
         boolean animation = (Boolean) parser.getOptionValue(animationArg, false);
+        boolean fullscreen = (Boolean) parser.getOptionValue(fullscreenArg,false);
 
         if (animation) {
 
@@ -215,10 +218,12 @@ public class Fractal {
             //Fractal f = new Fractal(width, height, true, threads, fz);
             Fractal f = new Fractal(width, height, true, threads);
             //f.setJulia(new Complex(0.36237,0.32), 10);
-
+            
+            f.loadFunctionOfZ(new MandelbrotBlue(2));
+            
             //f.setCycleMultiplier(50);
             f.setUpscale(upscale);
-            FractalWindow w = new FractalWindow(f, width, height,true);
+            FractalWindow w = new FractalWindow(f, width, height,fullscreen);
             f.setWindow(w);
             
 //            w.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -369,6 +374,11 @@ public class Fractal {
     
     public void loadMandelbrot(double k){
         functionOfZ = new Mandelbrot(k);
+        reset();
+    }
+    
+    public void loadFunctionOfZ(FunctionOfZ f){
+        functionOfZ = f;
         reset();
     }
     
