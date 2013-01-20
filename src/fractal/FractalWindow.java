@@ -643,7 +643,7 @@ public class FractalWindow extends javax.swing.JFrame implements IFractalWindow 
             @Override
             public void actionPerformed(ActionEvent e) {
                 
-                String filename = fractal.getFileName()+(width)+"x"+(height)+"_4aa";
+                String filename = fractal.getFileName()+"_"+(width)+"x"+(height)+"_4aa";
                 progressMonitor = new ProgressMonitor(thisPanel, "Exporting to "+filename+".png", null, 0, width+1);
                 progressMonitor.setMillisToDecideToPopup(0);
                 fractal.saveBig(filename, 4, true,progressMonitor);

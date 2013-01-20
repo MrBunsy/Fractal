@@ -31,7 +31,13 @@ public class MandelbrotBlue extends Mandelbrot{
             
             //0 to 1
             //s = (double)i/(double)detail;
-            
+            if(k==2){
+                z = newZ(z,c);// i++;
+                z = newZ(z,c);// i++;
+                z = newZ(z,c);// i++;
+//                z = newZ(z,c);
+//                z = newZ(z,c);
+            }
             s=(double)i +1 - Math.log(Math.log(z.abs()))/Math.log((double)k);
             
 //            Colour finished = colour1.add(colour2.dim(s));//.dim(s-1)
@@ -69,26 +75,34 @@ public class MandelbrotBlue extends Mandelbrot{
             /*
              * The colour cycle is broken into 4 parts
              * 
-             * first - red+green rise from 0 to 255
-             * second - r+g stay at 255, blue rises from 0 to 255
+             * first - red rises from 0 to 255, green rises to 128
+             * second - r stays at 255, blue rises from 0 to 255, green rises from 128 to 255
              * third - blue stays steady, r+g drop
              * forth - blue drops
              * 
              * 
              * note 0 < colour < cycleSize
              * 
+             * 
+             * idea: abstract this allowing schemes for each of the colours to be customised?
+             * 
              */
             
+            colour = cycleSize - colour;
+            
+            double cycle2 = cycleSize/2;
             double cycle4 = cycleSize/4;
             double cycle8 = cycleSize/8;
             
             if(colour < cycle4){
                 //first  chunk
-                r = g = 255*colour/cycle4;
+                r = 255*colour/cycle4;
+                g = 255*colour/cycle2;
                 b = 0;
-            }else if(colour < 2*cycle4){
+            }else if(colour < cycle2){
                 //second chunk
-                r = g = 255;
+                r = 255;
+                g = 255*colour/cycle2;
                 b = 255*(colour-cycle4)/cycle4;
             }else if(colour < 3*cycle4){
                 //third chunk
@@ -97,9 +111,10 @@ public class MandelbrotBlue extends Mandelbrot{
             }else{
                 //forth chunk
                 r = g = 0;
-                b = 255 * (1 - (colour-cycle4*3)/cycle8);
+                b = 255 * (1 - (colour-cycle4*3)/cycle4);
             }
             
+            //g*=0.7;
 //            r =  colour < cycle4 ? colour/cycle4 : 
 //            g = Math.min(s,255);
 //            b = Math.min( s<m/2 ? 0 : s-m/2   ,255);
