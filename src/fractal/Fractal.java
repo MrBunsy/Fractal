@@ -911,7 +911,9 @@ public class Fractal {
         return "images/" + (int) (System.currentTimeMillis() / 1000L);
     }
 
-    //saves buffer and info
+    /**
+     * saves buffer and info
+     */
     public void save() {
         String filename = getFileName();
 
@@ -946,7 +948,12 @@ public class Fractal {
         f.setUpscale(aaLevel);
         f.setChunkWidth(1);
     }
-
+    
+    /**
+     * Spit out a text file with the details of this fractal
+     * @param filename where to save, excluding .txt
+     * @throws IOException 
+     */
     public void saveInfo(String filename) throws IOException{
         //store a text file too
         FileWriter fstream = new FileWriter(filename + ".txt");
@@ -976,7 +983,7 @@ public class Fractal {
                 if(!applet){
                     ImageIO.write(aaImage, "png", new File(filename + ".png"));
                 }else{
-                    
+                    //TODO - find a way to get the applet to provide a download
                 }
                 if (progressMonitor != null) {
                     progressMonitor.setProgress(width + 2);

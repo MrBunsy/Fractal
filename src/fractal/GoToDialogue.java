@@ -15,6 +15,10 @@ import javax.swing.*;
 /**
  *
  * @author Luke
+ * 
+ * Dialogue box to choose where on the fractal to view, specifying x,y and zoom level.  
+ * When dialogue opens it defaults to the default centre of the fractal being viewed and the current zoom level
+ * Might change those defaults, not sure.
  */
 public class GoToDialogue extends JDialog{
     
@@ -82,11 +86,10 @@ public class GoToDialogue extends JDialog{
          //for helping with applets
          setModalExclusionType(java.awt.Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
     }
-    
+    /**
+     * Action of the use button - makes the user's input so.
+     */
     public void use(){
-        
-        
-        
         try{
             FractalSettings s = fractal.exportSettings();
             s.zoom=Double.parseDouble(zoom.getText());

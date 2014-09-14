@@ -44,7 +44,7 @@ public class MandelbrotBlue extends Mandelbrot{
 //            
 //            return finished.toColor();
             
-            
+            //Math.log(
             double cycleSize = Math.log(detail) * cycleMultiplier;
             double colour =  ((s + cycleOffset*cycleSize) % cycleSize);// / cycleSize;
 //            if(colour<0){
@@ -98,7 +98,7 @@ public class MandelbrotBlue extends Mandelbrot{
                 //first  chunk
                 r = 255*colour/cycle4;
                 g = 255*colour/cycle2;
-                b = 0;
+                b = 255*(0.5 - (colour)/cycle2);
             }else if(colour < cycle2){
                 //second chunk
                 r = 255;
@@ -106,12 +106,13 @@ public class MandelbrotBlue extends Mandelbrot{
                 b = 255*(colour-cycle4)/cycle4;
             }else if(colour < 3*cycle4){
                 //third chunk
-                r = g = 255 * (1 - (colour-cycle4*2)/cycle8);
+                r = g = 255 * (1 - (colour-cycle4*2)/cycle4);
                 b = 255;
             }else{
                 //forth chunk
                 r = g = 0;
-                b = 255 * (1 - (colour-cycle4*3)/cycle4);
+                //b = 255 * (1 - (colour-cycle4*3)/cycle4);
+                b = 255 * (1 - (colour-cycle4*3)/cycle2);
             }
             
             //g*=0.7;
