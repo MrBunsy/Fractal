@@ -250,10 +250,15 @@ public class Mandelbrot implements FunctionOfZ{
     public double defaultZoom() {
         return 3.0;
     }
+    
+    @Override
+    public int defaultSamples() {
+        return 1;
+    }
 
     @Override
     public FractalSettings defaultSettings() {
-        return new FractalSettings(defaultZoom(), defaultDetail(), defaultCentre(), this);
+        return new FractalSettings(defaultZoom(), defaultDetail(), defaultCentre(), this, defaultSamples());
     }
 
 //    public void openColourDialogue() {
@@ -290,6 +295,8 @@ public class Mandelbrot implements FunctionOfZ{
     public void setCycleOffset(double _cycleOffset) {
         cycleOffset=_cycleOffset;
     }
+
+    
     
 }
 

@@ -80,9 +80,9 @@ public class CustomExport extends javax.swing.JDialog {
             }
         });
 
-        aaLabel.setText("AA");
+        aaLabel.setText("Samples");
 
-        aaSelect.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "None", "2x", "4x", "8x" }));
+        aaSelect.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1", "4", "9", "16" }));
         aaSelect.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 aaSelectActionPerformed(evt);
@@ -135,7 +135,7 @@ public class CustomExport extends javax.swing.JDialog {
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(cancel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
                         .addComponent(export)))
                 .addContainerGap())
         );
@@ -188,7 +188,9 @@ public class CustomExport extends javax.swing.JDialog {
     private void exportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportActionPerformed
         String filename = fractal.getFileName();
         
-        int aa = (int)Math.pow(2,aaSelect.getSelectedIndex());
+//        int aa = (int)Math.pow(2,aaSelect.getSelectedIndex());
+        int aa = 1;
+        int samples = aaSelect.getSelectedIndex()+1;
 //        switch(aaSelect.getSelectedIndex()){
 //            case 0:
 //                aa=1;
@@ -208,7 +210,7 @@ public class CustomExport extends javax.swing.JDialog {
         int w=Integer.parseInt(width.getText());
         int h = Integer.parseInt(height.getText());
         
-        filename+="_"+w+"x"+h+ (aa > 1 ? "_"+aa+"aa" :"");
+        filename+="_"+w+"x"+h+ (samples > 1 ? "_"+samples+"samples" :"");
         
         if(infoBox.isSelected()){
             try {
@@ -221,7 +223,7 @@ public class CustomExport extends javax.swing.JDialog {
         //if aa is greater than 1, we're aaing, so we need an extra 1 for the progress to finish
         ProgressMonitor progressMonitor = new ProgressMonitor(parent, "Exporting to "+filename+".png", null, 0, w+(aa > 1 ? 2 : 1));
         progressMonitor.setMillisToDecideToPopup(0);
-        fractal.saveCertainRez(filename,w,h,aa,progressMonitor);
+        fractal.saveCertainRez(filename,w,h,aa,progressMonitor, samples);
         
         setVisible(false);
     }//GEN-LAST:event_exportActionPerformed

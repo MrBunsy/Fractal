@@ -59,6 +59,6 @@ public class CustomFunction extends Mandelbrot{
     
     @Override
     public FractalSettings defaultSettings() {
-        return new FractalSettings(defaultZoom(), defaultDetail(), defaultCentre(), this);
+        return new FractalSettings(defaultZoom(), defaultDetail(), defaultCentre(), this, defaultSamples());
     }
 }

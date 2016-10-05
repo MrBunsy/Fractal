@@ -73,8 +73,13 @@ public class Julia implements FunctionOfZ{
     }
 
     @Override
+    public int defaultSamples() {
+        return 2;
+    }
+    
+    @Override
     public FractalSettings defaultSettings() {
-        return new FractalSettings(defaultZoom(), defaultDetail(), defaultCentre(), this);
+        return new FractalSettings(defaultZoom(), defaultDetail(), defaultCentre(), this, defaultSamples());
     }
 
     @Override
@@ -118,6 +123,11 @@ public class Julia implements FunctionOfZ{
 //        }
         
         //cosine colouring - see http://eldar.mathstat.uoguelph.ca/dashlock/ftax/CosineCol.html
+        return colourLogic(c,oldC,i,detail);
+        
+    }
+    
+    public Color colourLogic(Complex c, Complex oldC, int i, int detail){
         switch(colour){
             
             case COSINE:
@@ -168,7 +178,6 @@ public class Julia implements FunctionOfZ{
                 }
                 return new Colour(0,0,0).toColor();
         }
-        
     }
     
     public String toString(){

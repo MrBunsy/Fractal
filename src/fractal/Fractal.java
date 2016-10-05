@@ -100,7 +100,7 @@ public class Fractal {
     private int upscale;
     private boolean allowSave, generationInProgress, needReGenerate, cancelGeneration;
     private boolean saveWhenFinished, postAntiAliasing;
-    private int sampleAntiAliasing = 4;
+    private int subPixelSamples = 1;//for better AntiAliasing than post-processing
     private String saveAs;
     private FractalThread[] fractalThreads;
     private Thread[] threadClasses;
@@ -231,11 +231,11 @@ public class Fractal {
     }
 
     //this is for a fractal that will be saved as soon as it's generated
-    public Fractal(int _width, int _height, int _threads, FunctionOfZ _functionOfZ, int _detail, double _zoom, Vector _centre, String _saveAs, boolean _aa) {
-        this(_width, _height, _threads, _functionOfZ, _detail, _zoom, _centre, _saveAs, _aa, null);
+    public Fractal(int _width, int _height, int _threads, FunctionOfZ _functionOfZ, int _detail, double _zoom, Vector _centre, String _saveAs, boolean _aa, int _subPixelSamples) {
+        this(_width, _height, _threads, _functionOfZ, _detail, _zoom, _centre, _saveAs, _aa, null, _subPixelSamples);
     }
 
-    public Fractal(int _width, int _height, int _threads, FunctionOfZ _functionOfZ, int _detail, double _zoom, Vector _centre, String _saveAs, boolean _aa, ProgressMonitor _progMon) {
+    public Fractal(int _width, int _height, int _threads, FunctionOfZ _functionOfZ, int _detail, double _zoom, Vector _centre, String _saveAs, boolean _aa, ProgressMonitor _progMon, int _subPixelSamples) {
         width = _width;
         height = _height;
         threads = _threads;
@@ -249,6 +249,7 @@ public class Fractal {
         postAntiAliasing = _aa;
 
         progressMonitor = _progMon;
+        subPixelSamples = _subPixelSamples;
 
         init();
 
@@ -416,7 +417,7 @@ public class Fractal {
 //        functionOfZ.openColourDialogue();
 //    }
     public FractalSettings exportSettings() {
-        return new FractalSettings(zoom, detail, centre, functionOfZ);
+        return new FractalSettings(zoom, detail, centre, functionOfZ, subPixelSamples);
     }
 
     public void loadSettings(FractalSettings settings) {
@@ -486,6 +487,12 @@ public class Fractal {
             case java.awt.event.KeyEvent.VK_SUBTRACT:
                 changeDetail(false);
                 break;
+            case java.awt.event.KeyEvent.VK_PAGE_UP:
+                changeSubPixelSamples(true);
+                break;
+            case java.awt.event.KeyEvent.VK_PAGE_DOWN:
+                changeSubPixelSamples(false);
+                break;
             case java.awt.event.KeyEvent.VK_PRINTSCREEN:
                 if (allowSave) {
                     save();
@@ -554,6 +561,20 @@ public class Fractal {
         }
 
         generate();
+    }
+
+    public void changeSubPixelSamples(boolean more) {
+        int old = subPixelSamples;
+        if (more) {
+            subPixelSamples++;
+        } else {
+            if (subPixelSamples > 1) {
+                subPixelSamples--;
+            }
+        }
+        if (subPixelSamples != old) {
+            generate();
+        }
     }
 
     public void drag(Point down, Point up) {
@@ -732,32 +753,32 @@ public class Fractal {
                     Complex z = new Complex(0, 0);
                     colour = functionOfZ.getColourFor(z, c, drawDetail);
                 } else {
-                    
-                    int internalAASqrd = internalAA*internalAA;
-                    
+
+                    int internalAASqrd = internalAA * internalAA;
+
                     //sample-based AA! sample in different places within the pixel and merge colours together
                     Color[] colours = new Color[internalAASqrd];
-                    
+
                     Vector c1 = pixelToComplex(x, y, adjustedDrawZoom).toVector();
-                    Vector c2 = pixelToComplex(x+1, y+1, adjustedDrawZoom).toVector();
-                    Vector diff = c2.subtract(c1).multiply(1.0/internalAA);
+                    Vector c2 = pixelToComplex(x + 1, y + 1, adjustedDrawZoom).toVector();
+                    Vector diff = c2.subtract(c1).multiply(1.0 / internalAA);
 //                    double diffX = diff.dot(new Vector(1,0));
 //                    double diffY = diff.dot(new Vector(0,1));
-                    
+
                     for (int i = 0; i < internalAA; i++) {
-                        for(int j = 0;j<internalAA;j++){
-                            
-                            Vector cVector = new Vector(c1.x+diff.x*i,c1.y+diff.y*j);
-                            
+                        for (int j = 0; j < internalAA; j++) {
+
+                            Vector cVector = new Vector(c1.x + diff.x * i, c1.y + diff.y * j);
+
                             Complex z = new Complex(0, 0);
-                            
+
                             Complex c = new Complex(cVector);
 //                            System.out.println(c);
-                            
-                            colours[i*internalAA+j] = functionOfZ.getColourFor(z, c, drawDetail);
+
+                            colours[i * internalAA + j] = functionOfZ.getColourFor(z, c, drawDetail);
                         }
                     }
-                    
+
                     int r = 0, b = 0, g = 0;
 
                     for (int i = 0; i < internalAASqrd; i++) {
@@ -806,7 +827,7 @@ public class Fractal {
                     if (drawTo > width) {
                         drawTo = width;
                     }
-                    fractalThreads[t] = new FractalThread(this, threadsDrawnTo, drawTo, t, sampleAntiAliasing);
+                    fractalThreads[t] = new FractalThread(this, threadsDrawnTo, drawTo, t, subPixelSamples);
                     threadClasses[t] = new Thread(fractalThreads[t]);
                     threadClasses[t].start();
                     threadsDrawnTo += chunkWidth;
@@ -816,7 +837,7 @@ public class Fractal {
 
                 //not using threads, just doing it here
                 for (int x = 0; x < width; x++) {
-                    generateStrip(x, x + 1, sampleAntiAliasing);
+                    generateStrip(x, x + 1, subPixelSamples);
                 }
 
                 cancelGeneration = false;
@@ -933,26 +954,26 @@ public class Fractal {
         //saveBig(filename+"_aa",upscale,true,null);
     }
 
-    public void saveBig(String filename) {
-        saveBig(filename, upscale, true, null);
+    public void saveBig(String filename, int samples) {
+        saveBig(filename, upscale, true, null, samples);
     }
 
     //this assumes we're just AA the image at the same rez
-    public void saveBig(String filename, int scale, boolean _aa, ProgressMonitor pm) {
-        saveBig(filename, scale, scale, _aa, pm);
+    public void saveBig(String filename, int scale, boolean _aa, ProgressMonitor pm, int samples) {
+        saveBig(filename, scale, scale, _aa, pm, samples);
     }
 
     //can also make the image bigger as well as AA it!
-    public void saveBig(String filename, int scaleUp, int scaleDown, boolean _aa, ProgressMonitor pm) {
+    public void saveBig(String filename, int scaleUp, int scaleDown, boolean _aa, ProgressMonitor pm, int samples) {
         //this should be auto-saved
-        Fractal f = new Fractal(width * scaleUp, height * scaleUp, threads, functionOfZ, detail, zoom, centre, filename, _aa, pm);
+        Fractal f = new Fractal(width * scaleUp, height * scaleUp, threads, functionOfZ, detail, zoom, centre, filename, _aa, pm, samples);
         //f.setProgressMonitor(progressMonitor);
         f.setUpscale(scaleDown);
         f.setChunkWidth(1);
     }
 
-    public void saveCertainRez(String filename, int w, int h, int aaLevel, ProgressMonitor pm) {
-        Fractal f = new Fractal(w * aaLevel, h * aaLevel, threads, functionOfZ, detail, zoom, centre, filename, aaLevel > 1, pm);
+    public void saveCertainRez(String filename, int w, int h, int aaLevel, ProgressMonitor pm, int samples) {
+        Fractal f = new Fractal(w * aaLevel, h * aaLevel, threads, functionOfZ, detail, zoom, centre, filename, aaLevel > 1, pm, samples);
         //f.setProgressMonitor(progressMonitor);
         f.setUpscale(aaLevel);
         f.setChunkWidth(1);
@@ -1027,6 +1048,7 @@ public class Fractal {
         return "Centre: " + (detailed ? "(" + centre.x + "," + centre.y + ")" : centre.toString(true)) + ", "
                 + "Zoom: " + (detailed ? zoom : Math.round(zoom * 10000d) / 10000d) + ", "
                 + "Detail: " + detail + ", "
+                + "Samples: " + subPixelSamples + ", "
                 //+ (detailed ?  ", Function: " + functionOfZ.toString() : "" );
                 + functionOfZ.toString(detailed);
         //(detailed ? "ColourCycleMultiplier: "+cycleMultiplier : "");

@@ -20,6 +20,8 @@ public interface FunctionOfZ {
     
     public int defaultDetail();
     
+    public int defaultSamples();
+    
     public double defaultZoom();
     
     public FractalSettings defaultSettings();
