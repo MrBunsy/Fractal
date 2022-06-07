@@ -353,6 +353,11 @@ public class Fractal {
 //            window.repaint();
 //        }
     }
+    
+    public void loadMandelbrotBlue() {
+        functionOfZ = new MandelbrotBlue(2);
+        reset();
+    }
 
     public void loadCustomFunction() {
         functionOfZ = new CustomFunction2();
